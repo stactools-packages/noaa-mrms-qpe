@@ -1,8 +1,8 @@
 import unittest
 
-import stactools.ephemeral
+import stactools.noaa_mrms_qpe
 
 
 class TestModule(unittest.TestCase):
     def test_version(self) -> None:
-        self.assertIsNotNone(stactools.ephemeral.__version__)
+        self.assertIsNotNone(stactools.noaa_mrms_qpe.__version__)

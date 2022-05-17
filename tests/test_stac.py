@@ -1,6 +1,6 @@
 import unittest
 
-from stactools.ephemeral import stac
+from stactools.noaa_mrms_qpe import stac
 
 
 class StacTest(unittest.TestCase):

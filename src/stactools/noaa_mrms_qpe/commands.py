@@ -3,22 +3,22 @@ import logging
 import click
 from click import Command, Group
 
-from stactools.ephemeral import stac
+from stactools.noaa_mrms_qpe import stac
 
 logger = logging.getLogger(__name__)
 
 
-def create_ephemeralcmd_command(cli: Group) -> Command:
-    """Creates the stactools-ephemeral command line utility."""
+def create_noaamrmsqpe_command(cli: Group) -> Command:
+    """Creates the stactools-noaa-mrms-qpe command line utility."""
 
     @cli.group(
-        "ephemeralcmd",
-        short_help=("Commands for working with stactools-ephemeral"),
+        "noaamrmsqpe",
+        short_help=("Commands for working with stactools-noaa-mrms-qpe"),
     )
-    def ephemeralcmd() -> None:
+    def noaamrmsqpe() -> None:
         pass
 
-    @ephemeralcmd.command(
+    @noaamrmsqpe.command(
         "create-collection",
         short_help="Creates a STAC collection",
     )
@@ -37,7 +37,7 @@ def create_ephemeralcmd_command(cli: Group) -> Command:
 
         return None
 
-    @ephemeralcmd.command("create-item", short_help="Create a STAC item")
+    @noaamrmsqpe.command("create-item", short_help="Create a STAC item")
     @click.argument("source")
     @click.argument("destination")
     def create_item_command(source: str, destination: str) -> None:
@@ -53,4 +53,4 @@ def create_ephemeralcmd_command(cli: Group) -> Command:
 
         return None
 
-    return ephemeralcmd
+    return noaamrmsqpe

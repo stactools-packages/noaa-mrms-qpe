@@ -1,4 +1,4 @@
-name: stactools-ephemeral
+name: stactools-noaa-mrms-qpe
 channels:
   - conda-forge
   - defaults
