@@ -28,8 +28,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             collection = pystac.read_file(destination)
-            self.assertEqual(collection.id, "my-collection-id")
-            # self.assertEqual(item.other_attr...
+            self.assertEqual(collection.id, "noaa-mrms-qpe-1h-pass1")
 
             collection.validate()
 
@@ -38,10 +37,12 @@ class CommandsTest(CliTestCase):
             # Run your custom create-item command and validate
 
             # Example:
-            infile = "/path/to/asset.tif"
+            id = "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
+            aoi = "HAWAII"
+            infile = f"/path/to/{id}.grib2"
             destination = os.path.join(tmp_dir, "item.json")
             result = self.run_command(
-                f"noaa_mrms_qpe create-item {infile} {destination}"
+                f"noaa_mrms_qpe create-item {infile} {destination} --aoi {aoi}"
             )
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 
@@ -49,7 +50,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "my-item-id")
+            self.assertEqual(item.id, f"{aoi}_{id}")
             # self.assertEqual(item.other_attr...
 
             item.validate()

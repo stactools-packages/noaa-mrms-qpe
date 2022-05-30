@@ -7,24 +7,24 @@ class StacTest(unittest.TestCase):
     def test_create_collection(self) -> None:
         # Write tests for each for the creation of a STAC Collection
         # Create the STAC Collection...
-        collection = stac.create_collection(period=1, pass_no=1)
+        collection = stac.create_collection(period=3, pass_no=2)
         collection.set_self_href("")
 
         # Check that it has some required attributes
-        self.assertEqual(collection.id, "my-collection-id")
-        # self.assertEqual(collection.other_attr...
+        self.assertEqual(collection.id, "noaa-mrms-qpe-3h-pass2")
 
         # Validate
         collection.validate()
 
     def test_create_item(self) -> None:
+        id = "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
+
         # Write tests for each for the creation of STAC Items
         # Create the STAC Item...
-        item = stac.create_item("/path/to/asset.tif")
+        item = stac.create_item(f"{id}.grib2")
 
         # Check that it has some required attributes
-        self.assertEqual(item.id, "my-item-id")
-        # self.assertEqual(item.other_attr...
+        self.assertEqual(item.id, f"CONUS_{id}")
 
         # Validate
         item.validate()
