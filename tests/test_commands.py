@@ -6,12 +6,12 @@ import pystac
 from click import Command, Group
 from stactools.testing.cli_test import CliTestCase
 
-from stactools.noaa_mrms_qpe.commands import create_noaamrmsqpe_command
+from stactools.noaa_mrms_qpe.commands import create_noaa_mrms_qpe_command
 
 
 class CommandsTest(CliTestCase):
     def create_subcommand_functions(self) -> List[Callable[[Group], Command]]:
-        return [create_noaamrmsqpe_command]
+        return [create_noaa_mrms_qpe_command]
 
     def test_create_collection(self) -> None:
         with TemporaryDirectory() as tmp_dir:
@@ -20,7 +20,7 @@ class CommandsTest(CliTestCase):
             # Example:
             destination = os.path.join(tmp_dir, "collection.json")
 
-            result = self.run_command(f"noaamrmsqpe create-collection {destination}")
+            result = self.run_command(f"noaa_mrms_qpe create-collection {destination}")
 
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 
@@ -40,7 +40,9 @@ class CommandsTest(CliTestCase):
             # Example:
             infile = "/path/to/asset.tif"
             destination = os.path.join(tmp_dir, "item.json")
-            result = self.run_command(f"noaamrmsqpe create-item {infile} {destination}")
+            result = self.run_command(
+                f"noaa_mrms_qpe create-item {infile} {destination}"
+            )
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 
             jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]

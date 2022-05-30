@@ -26,10 +26,32 @@ pip install stactools-noaa-mrms-qpe
 
 ## Command-line Usage
 
-Description of the command line functions
+### Collection
+
+Create a collection, e.g. 24-hour Pass 2:
+
+```shell
+stac noaa_mrms_qpe create-collection collection.json --period 24 --pass_no 2
+```
+
+Get information about all options for collection creation:
+
+```shell
+stac noaa_mrms_qpe create-collection --help
+```
+
+### Item
+
+Create an item:
 
 ```shell
 $ stac noaa-mrms-qpe create-item source destination
+```
+
+Get information about all options for item creation:
+
+```shell
+stac noaa_mrms_qpe create-item --help
 ```
 
 Use `stac noaa-mrms-qpe --help` to see all subcommands and options.
@@ -62,4 +84,4 @@ $ pytest -vv
 - [ ] Implementation
 - [ ] Tests
 - [ ] Documentation
-- [ ] Examples
+- [x] Examples

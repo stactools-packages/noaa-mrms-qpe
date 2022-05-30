@@ -11,50 +11,112 @@ from pystac import (
     Provider,
     ProviderRole,
     SpatialExtent,
+    Summaries,
     TemporalExtent,
 )
 from pystac.extensions.projection import ProjectionExtension
 
+from . import constants
+
 logger = logging.getLogger(__name__)
 
 
-def create_collection() -> Collection:
-    """Create a STAC Collection
+def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collection:
+    """Create a STAC Collection for NOAA MRMS QPE sub-products.
 
-    This function includes logic to extract all relevant metadata from
-    an asset describing the STAC collection and/or metadata coded into an
-    accompanying constants.py file.
-
-    See `Collection<https://pystac.readthedocs.io/en/latest/api.html#collection>`_.
+    Args:
+        period (int): The time period the sub-product is for (either 1, 3, 6, 12, 24, 48, or 72)
+        pass_no (int): The pass number of the sub-product (either 1 or 2)
+        thumbnail (str): URL for the collection thumbnail asset (none if empty)
 
     Returns:
         Collection: STAC Collection object
     """
     providers = [
         Provider(
-            name="The OS Community",
-            roles=[ProviderRole.PRODUCER, ProviderRole.PROCESSOR, ProviderRole.HOST],
-            url="https://github.com/stac-utils/stactools",
-        )
+            name="NOAA National Severe Storms Laboratory",
+            roles=[ProviderRole.PRODUCER, ProviderRole.LICENSOR],
+            url="https://www.nssl.noaa.gov/projects/mrms",
+        ),
+        Provider(
+            name="Stactools",
+            roles=[ProviderRole.PROCESSOR],
+            description="Conversion from GRIB to COG files",
+            url=constants.REPOSITORY,
+        ),
     ]
 
     # Time must be in UTC
     demo_time = datetime.now(tz=timezone.utc)
 
+    spatial_extents = list(constants.EXTENTS.values())
     extent = Extent(
-        SpatialExtent([[-180.0, 90.0, 180.0, -90.0]]),
+        SpatialExtent(spatial_extents),
         TemporalExtent([[demo_time, None]]),
     )
 
+    keywords = [
+        "NOAA",
+        "MRMS",
+        "QPE",
+        "multi-radar",
+        "multi-sensor",
+        "precipitation",
+        "{t}-hour".format(t=period),
+    ]
+
+    description = (
+        "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation "
+        "(QPE) product is generated fully automatically from multiple sources to generate "
+        "seamless, hourly 1 km mosaics over the US.\n\n"
+    )
+    if pass_no == 1:
+        description += (
+            "This is the {t}-hour pass 1 product with less latency (60 min), "
+            "but less gauges (60-65 %)."
+        )
+    elif pass_no == 2:
+        description += (
+            "This is the {t}-hour pass 2 product with more latency (120 min), "
+            "but more gauges (99 %)."
+        )
+
+    summaries = Summaries({})
+    summaries.add(constants.EXT_PASS, [pass_no])
+    summaries.add(constants.EXT_PERIOD, [period])
+
     collection = Collection(
-        id="my-collection-id",
-        title="A dummy STAC Collection",
-        description="Used for demonstration purposes",
-        license="CC-0",
+        stac_extensions=[constants.EXTENSION],
+        id="noaa-mrms-qpe-{t}h-pass{p}".format(t=period, p=pass_no),
+        title="NOAA MRMS QPE {t}-hour Pass {p}".format(t=period, p=pass_no),
+        description=description.format(t=period),
+        keywords=keywords,
+        license="proprietary",
         providers=providers,
         extent=extent,
+        summaries=summaries,
         catalog_type=CatalogType.RELATIVE_PUBLISHED,
     )
+
+    collection.add_link(constants.LINK_LICENSE)
+    collection.add_link(constants.LINK_MRMS_HOME)
+    collection.add_link(constants.LINK_MRMS_TECH_GUIDE)
+
+    if len(thumbnail) > 0:
+        if thumbnail.endswith(".png"):
+            media_type = MediaType.PNG
+        else:
+            media_type = MediaType.JPEG
+
+        collection.add_asset(
+            "thumbnail",
+            Asset(
+                href=thumbnail,
+                title="Preview",
+                roles=["thumbnail"],
+                media_type=media_type,
+            ),
+        )
 
     return collection
 
@@ -88,12 +150,12 @@ def create_item(asset_href: str) -> Item:
     demo_time = datetime.now(tz=timezone.utc)
 
     item = Item(
+        stac_extensions=[constants.EXTENSION],
         id="my-item-id",
         properties=properties,
         geometry=demo_geom,
         bbox=[-180, 90, 180, -90],
         datetime=demo_time,
-        stac_extensions=[],
     )
 
     # It is a good idea to include proj attributes to optimize for libs like stac-vrt
