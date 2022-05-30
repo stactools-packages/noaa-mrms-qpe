@@ -168,6 +168,10 @@ def create_item(
     item = Item(
         stac_extensions=[
             constants.EXTENSION,
+            # we have to use file extension v1.0.0 as no other extension
+            # supports to specify multiple no-data values.
+            # The GRIB files from NOAA have two no-data vlaues though (-1, -3).
+            # We can probably migrate to raster if to_cog is true.
             "https://stac-extensions.github.io/file/v1.0.0/schema.json",
         ],
         id=id,

@@ -4,13 +4,15 @@
 
 - Name: noaa-mrms-qpe
 - Package: `stactools.noaa_mrms_qpe`
-- PyPI: https://pypi.org/project/stactools-noaa-mrms-qpe/
+- PyPI: <https://pypi.org/project/stactools-noaa-mrms-qpe/>
 - Owner: @m-mohr
-- Dataset homepage: https://mrms.nssl.noaa.gov
+- Dataset homepage: <https://mrms.nssl.noaa.gov>
 - STAC extensions used:
+  - [file v1.0.0](https://github.com/stac-extensions/file/) [may update to raster extension for COGs]
   - [proj](https://github.com/stac-extensions/projection/)
+  - [timestamps](https://github.com/stac-extensions/timestamps/)
 - Extra fields:
-  - `noaa-mrms-qpe:custom`: A custom attribute
+  - See [NOAA MRMS QPE extension](./extension/README.md) for details
 
 A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Precipitation Estimation (QPE) dataset.
 
@@ -78,10 +80,3 @@ To run the tests:
 ```shell
 $ pytest -vv
 ```
-
-## Roadmap
-
-- [ ] Implementation
-- [ ] Tests
-- [ ] Documentation
-- [x] Examples
