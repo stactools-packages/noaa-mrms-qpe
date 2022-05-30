@@ -5,6 +5,8 @@ from click import Command, Group
 
 from stactools.noaa_mrms_qpe import stac
 
+from pystac import read_file
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,7 +38,7 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @click.option(
         "--id",
         default="",
-        help='A custom collection ID, defaults to "noaa-mrms-qpe-{t}h-pass{p}"',
+        help="A custom collection ID, defaults to 'noaa-mrms-qpe-{t}h-pass{p}'",
     )
     @click.option(
         "--thumbnail",
@@ -66,15 +68,29 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @noaa_mrms_qpe.command("create-item", short_help="Create a STAC item")
     @click.argument("source")
     @click.argument("destination")
-    def create_item_command(source: str, destination: str) -> None:
+    @click.option(
+        "--aoi",
+        default="CONUS",
+        help="The area of interest, either 'ALASKA', 'CONUS' (continental US, default), "
+        "'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'",
+    )
+    @click.option(
+        "--collection",
+        default="",
+        help="An HREF to the Collection JSON",
+    )
+    def create_item_command(source: str, destination: str, aoi: str = "CONUS", collection: str = "") -> None:
         """Creates a STAC Item
 
         Args:
             source (str): HREF of the Asset associated with the Item
-            destination (str): An HREF for the STAC Collection
+            destination (str): An HREF for the STAC Item
         """
-        item = stac.create_item(source)
+        stac_collection = None
+        if len(collection) > 0:
+            stac_collection = read_file(collection)
 
+        item = stac.create_item(source, aoi, stac_collection)
         item.save_object(dest_href=destination)
 
         return None

@@ -45,7 +45,7 @@ stac noaa_mrms_qpe create-collection --help
 Create an item:
 
 ```shell
-$ stac noaa-mrms-qpe create-item source destination
+$ stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220516-180000.grib2.gz item.json --aoi ALASKA
 ```
 
 Get information about all options for item creation:

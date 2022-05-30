@@ -1,5 +1,7 @@
 import logging
+import os
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Union
 
 from pystac import (
     Asset,
@@ -15,6 +17,7 @@ from pystac import (
     TemporalExtent,
 )
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.timestamps import TimestampsExtension
 
 from . import constants
 
@@ -121,7 +124,7 @@ def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collect
     return collection
 
 
-def create_item(asset_href: str) -> Item:
+def create_item(asset_href: str, aoi: str = "CONUS", collection: Union[Collection, None] = None) -> Item:
     """Create a STAC Item
 
     This function should include logic to extract all relevant metadata from an
@@ -131,49 +134,92 @@ def create_item(asset_href: str) -> Item:
 
     Args:
         asset_href (str): The HREF pointing to an asset associated with the item
+        aoi (str): The area of interest, either 'ALASKA', 'CONUS' (continental US, default),
+            'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'
 
     Returns:
         Item: STAC Item object
     """
 
+    basics = parse_filename(asset_href)
+    id = aoi + "_" + basics["id"]
+
+    bbox = constants.EXTENTS[aoi]
+
+    description = "Multi-sensor accumulation {p}-hour ({t}-hour latency) [mm]".format(
+        p=basics["period"], t=basics["pass_no"]
+    )
+
     properties = {
-        "title": "A dummy STAC Item",
-        "description": "Used for demonstration purposes",
+        constants.EXT_PASS: basics["pass_no"],
+        constants.EXT_PERIOD: basics["period"],
+        "description": description,
     }
-
-    demo_geom = {
-        "type": "Polygon",
-        "coordinates": [[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]],
-    }
-
-    # Time must be in UTC
-    demo_time = datetime.now(tz=timezone.utc)
 
     item = Item(
-        stac_extensions=[constants.EXTENSION],
-        id="my-item-id",
+        stac_extensions=[
+            constants.EXTENSION,
+            "https://stac-extensions.github.io/file/v1.0.0/schema.json",
+        ],
+        id=id,
         properties=properties,
-        geometry=demo_geom,
-        bbox=[-180, 90, 180, -90],
-        datetime=demo_time,
+        geometry=bbox_to_polygon(bbox),
+        bbox=bbox,
+        datetime=basics["datetime"],
+        collection=collection
     )
 
     # It is a good idea to include proj attributes to optimize for libs like stac-vrt
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
-    proj_attrs.epsg = 4326
-    proj_attrs.bbox = [-180, 90, 180, -90]
-    proj_attrs.shape = [1, 1]  # Raster shape
-    proj_attrs.transform = [-180, 360, 0, 90, 0, 180]  # Raster GeoTransform
+    proj_attrs.epsg = None
+    proj_attrs.projjson = constants.PROJJSON
+    proj_attrs.shape = constants.SHAPES[aoi]
 
     # Add an asset to the item (COG for example)
-    item.add_asset(
-        "image",
-        Asset(
-            href=asset_href,
-            media_type=MediaType.COG,
-            roles=["data"],
-            title="A dummy STAC Item COG",
-        ),
+    asset = Asset(
+        href=asset_href,
+        # media_type=MediaType.COG,
+        media_type="application/wmo-GRIB2",
+        roles=["data"],
+        extra_fields={
+            "file:data_type": constants.DATATYPE,
+            "file:nodata": constants.NODATA,
+            "file:unit": constants.UNIT,
+        },
     )
+    item.add_asset("data", asset)
+
+    ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
+    ts_attrs.expires = basics["datetime"]
 
     return item
+
+
+def parse_filename(path: str) -> Dict[str, Any]:
+    filename = os.path.basename(path)
+    parts = constants.FILENAME_PATTERN.match(filename)
+    if parts is None:
+        raise ValueError("Filename is not valid")
+
+    year = int(parts.group(4))
+    month = int(parts.group(5))
+    day = int(parts.group(6))
+    hour = int(parts.group(7))
+    time = datetime(year, month, day, hour, tzinfo=timezone.utc)
+
+    return {
+        "id": parts.group(1),
+        "period": int(parts.group(2)),
+        "pass_no": int(parts.group(3)),
+        "datetime": time,
+        "gzipped": False if parts.group(8) is None else True,
+    }
+
+
+def bbox_to_polygon(b: List[float]) -> Dict[str, Any]:
+    return {
+        "type": "Polygon",
+        "coordinates": [
+            [[b[0], b[3]], [b[2], b[3]], [b[2], b[1]], [b[0], b[1]], [b[0], b[3]]]
+        ],
+    }
