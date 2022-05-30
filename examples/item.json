@@ -1,7 +1,7 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "id": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220516-180000",
+  "id": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000",
   "properties": {
     "noaa_mrms_qpe:pass": 2,
     "noaa_mrms_qpe:period": 24,
@@ -42,7 +42,7 @@
       7000,
       3500
     ],
-    "datetime": "2022-05-16T18:00:00Z"
+    "datetime": "2022-05-30T12:00:00Z"
   },
   "geometry": {
     "type": "Polygon",
@@ -81,7 +81,7 @@
   ],
   "assets": {
     "data": {
-      "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220516-180000.tiff",
+      "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "file:data_type": "float64",
       "file:nodata": [
@@ -89,7 +89,7 @@
         -3
       ],
       "file:unit": "mm",
-      "expires": "2022-05-16T18:00:00Z",
+      "expires": "2022-05-30T12:00:00Z",
       "roles": [
         "data"
       ]
@@ -104,8 +104,8 @@
   "stac_extensions": [
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
     "https://stac-extensions.github.io/file/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/timestamps/v1.0.0/schema.json"
+    "https://stac-extensions.github.io/timestamps/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
   ],
   "collection": "noaa-mrms-qpe-24h-pass2"
 }

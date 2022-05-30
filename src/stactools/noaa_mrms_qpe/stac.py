@@ -19,7 +19,7 @@ from pystac import (
 from pystac.extensions.projection import ProjectionExtension
 from pystac.extensions.timestamps import TimestampsExtension
 
-from . import constants
+from . import cog, constants
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,13 @@ def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collect
     return collection
 
 
-def create_item(asset_href: str, aoi: str = "CONUS", collection: Union[Collection, None] = None) -> Item:
+def create_item(
+    asset_href: str,
+    aoi: str = "CONUS",
+    collection: Union[Collection, None] = None,
+    to_cog: bool = False,
+    epsg: int = 0,
+) -> Item:
     """Create a STAC Item
 
     This function should include logic to extract all relevant metadata from an
@@ -136,6 +142,9 @@ def create_item(asset_href: str, aoi: str = "CONUS", collection: Union[Collectio
         asset_href (str): The HREF pointing to an asset associated with the item
         aoi (str): The area of interest, either 'ALASKA', 'CONUS' (continental US, default),
             'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'
+        collection (pystac.Collection): HREF to an existing collection
+        to_cog (bool): Converts the GRIB2 files to COG if set to true.
+            Defaults to false, which keeps the file as is.
 
     Returns:
         Item: STAC Item object
@@ -166,24 +175,37 @@ def create_item(asset_href: str, aoi: str = "CONUS", collection: Union[Collectio
         geometry=bbox_to_polygon(bbox),
         bbox=bbox,
         datetime=basics["datetime"],
-        collection=collection
+        collection=collection,
     )
 
-    # It is a good idea to include proj attributes to optimize for libs like stac-vrt
-    proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
-    proj_attrs.epsg = None
-    proj_attrs.projjson = constants.PROJJSON
-    proj_attrs.shape = constants.SHAPES[aoi]
+    if cog and epsg > 0:
+        crs = "epsg:" + str(epsg)
+    else:
+        crs = None
+
+    media_type = ""
+    if to_cog:
+        media_type = MediaType.COG
+        # todo
+        nodata = None
+        href = cog.convert(asset_href, unzip=basics["gzip"], reproject_to=crs)
+    else:
+        media_type = "application/wmo-GRIB2"
+        nodata = [-1, -3]
+        if basics["gzip"]:
+            href = cog.decompress(asset_href)
+        else:
+            href = asset_href
 
     # Add an asset to the item (COG for example)
     asset = Asset(
-        href=asset_href,
-        # media_type=MediaType.COG,
-        media_type="application/wmo-GRIB2",
+        href=href,
+        media_type=media_type,
         roles=["data"],
         extra_fields={
-            "file:data_type": constants.DATATYPE,
-            "file:nodata": constants.NODATA,
+            # todo: check whether data type is correct
+            "file:data_type": "float64",
+            "file:nodata": nodata,
             "file:unit": constants.UNIT,
         },
     )
@@ -191,6 +213,17 @@ def create_item(asset_href: str, aoi: str = "CONUS", collection: Union[Collectio
 
     ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
     ts_attrs.expires = basics["datetime"]
+
+    # It is a good idea to include proj attributes to optimize for libs like stac-vrt
+    proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
+    if cog and epsg > 0:
+        proj_attrs.epsg = epsg
+        # todo: set shape based on actual file dimensions
+        # proj_attrs.shape = ...
+    else:
+        proj_attrs.epsg = None
+        proj_attrs.projjson = constants.PROJJSON
+        proj_attrs.shape = constants.SHAPES[aoi]
 
     return item
 
@@ -212,7 +245,7 @@ def parse_filename(path: str) -> Dict[str, Any]:
         "period": int(parts.group(2)),
         "pass_no": int(parts.group(3)),
         "datetime": time,
-        "gzipped": False if parts.group(8) is None else True,
+        "gzip": False if parts.group(8) is None else True,
     }
 
 

@@ -85,5 +85,3 @@ PROJJSON = {
 }
 
 UNIT = "mm"
-NODATA = [-1, -3]
-DATATYPE = "float64"

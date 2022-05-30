@@ -2,10 +2,9 @@ import logging
 
 import click
 from click import Command, Group
+from pystac import Collection
 
 from stactools.noaa_mrms_qpe import stac
-
-from pystac import read_file
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +78,24 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         default="",
         help="An HREF to the Collection JSON",
     )
-    def create_item_command(source: str, destination: str, aoi: str = "CONUS", collection: str = "") -> None:
+    @click.option(
+        "--cog",
+        default=False,
+        help="Converts the GRIB2 file to COG",
+    )
+    @click.option(
+        "--epsg",
+        default=0,
+        help="Converts the COG files to the given EPSG Code (e.g. 3857)",
+    )
+    def create_item_command(
+        source: str,
+        destination: str,
+        aoi: str = "CONUS",
+        collection: str = "",
+        cog: bool = False,
+        epsg: int = 0,
+    ) -> None:
         """Creates a STAC Item
 
         Args:
@@ -88,9 +104,9 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         """
         stac_collection = None
         if len(collection) > 0:
-            stac_collection = read_file(collection)
+            stac_collection = Collection.from_file(collection)
 
-        item = stac.create_item(source, aoi, stac_collection)
+        item = stac.create_item(source, aoi, stac_collection, cog, epsg)
         item.save_object(dest_href=destination)
 
         return None
