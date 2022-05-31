@@ -61,8 +61,8 @@
         {
           "spatial_resolution": 1000,
           "unit": "mm",
-	  "nodata": "nan",
-	  "data_type": "float64"
+          "nodata": "nan",
+          "data_type": "float64"
         }
       ]
     }

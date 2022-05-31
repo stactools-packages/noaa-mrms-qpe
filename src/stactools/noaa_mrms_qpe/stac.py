@@ -248,25 +248,30 @@ def create_item(
     ts_attrs.expires = basics["datetime"]
 
     shape = None
-    if to_cog:
-        with rasterio.open(href) as dataset:
-            if len(dataset.shape) == 2:
-                shape = [dataset.shape[1], dataset.shape[0]]
-            if len(dataset.indexes) == 1:
-                band = RasterBand.create()
-                band.spatial_resolution = constants.RESOLUTION_M
-                band.unit = constants.UNIT
-                band.nodata = dataset.nodatavals[0]
-                band.data_type = DataType(dataset.dtypes[0])
+    transform = None
+    with rasterio.open(href) as dataset:
+        if dataset.transform:
+            transform = list(dataset.transform)[0:6]
 
-                raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
-                raster_attrs.bands = [band]
-    else:
-        shape = constants.SHAPES[aoi]
+        if len(dataset.shape) == 2:
+            shape = [dataset.shape[1], dataset.shape[0]]
+
+        if to_cog and len(dataset.indexes) == 1:
+            band = RasterBand.create()
+            band.spatial_resolution = constants.RESOLUTION_M
+            band.unit = constants.UNIT
+            band.nodata = dataset.nodatavals[0]
+            band.data_type = DataType(dataset.dtypes[0])
+
+            raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
+            raster_attrs.bands = [band]
 
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
     if shape:
         proj_attrs.shape = shape
+
+    if transform:
+        proj_attrs.transform = transform
 
     if to_cog and epsg > 0:
         proj_attrs.epsg = epsg

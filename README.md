@@ -23,6 +23,8 @@ A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Prec
 - [Item with a COG asset](examples/item/item.json)
 - [Item with a GRIB2 asset](examples/item/item_grib.json)
 
+[Browse the examples in a human-readable form](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/collection.json)
+
 ## Installation
 ```shell
 pip install stactools-noaa-mrms-qpe

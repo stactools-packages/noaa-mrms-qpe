@@ -22,14 +22,6 @@ EXTENTS = {
     "CARIB": [-90.0, 10.0, -60.0, 25.0],  # Caribbean
 }
 
-SHAPES = {
-    "CONUS": [7000, 3500],
-    "HAWAII": [2600, 2200],
-    "GUAM": [2000, 1800],
-    "ALASKA": [5000, 2200],
-    "CARIB": [3000, 1500],
-}
-
 LINK_LICENSE = Link(
     target="https://www.nssl.noaa.gov/projects/mrms/nmq_data_policy_OGCrevised.pdf",
     rel=RelType.LICENSE,
