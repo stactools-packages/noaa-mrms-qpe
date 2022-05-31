@@ -8,6 +8,7 @@ EXTENSION = (
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"
     "/main/extension/schema.json"
 )
+FILE_EXTENSION_V1 = "https://stac-extensions.github.io/file/v1.0.0/schema.json"
 
 EXT_PASS = "noaa_mrms_qpe:pass"
 EXT_PERIOD = "noaa_mrms_qpe:period"
@@ -89,3 +90,7 @@ RESOLUTION_M = 1000  # 1km
 
 GRIB_DATATYPE = "float64"
 GRIB_NODATA = [-1, -3]
+GRIB_MEDIATYPE = "application/wmo-GRIB2"
+
+ASSET_KEY = "data"
+ASSET_ROLES = ["data"]

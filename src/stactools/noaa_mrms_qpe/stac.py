@@ -17,7 +17,9 @@ from pystac import (
     Summaries,
     TemporalExtent,
 )
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.raster import SCHEMA_URI as RASTER_EXTENSION
 from pystac.extensions.raster import DataType, RasterBand, RasterExtension
 from pystac.extensions.timestamps import TimestampsExtension
 
@@ -26,13 +28,16 @@ from . import cog, constants
 logger = logging.getLogger(__name__)
 
 
-def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collection:
+def create_collection(
+    period: int, pass_no: int, thumbnail: str = "", cog: bool = False
+) -> Collection:
     """Create a STAC Collection for NOAA MRMS QPE sub-products.
 
     Args:
         period (int): The time period the sub-product is for (either 1, 3, 6, 12, 24, 48, or 72)
         pass_no (int): The pass number of the sub-product (either 1 or 2)
         thumbnail (str): URL for the collection thumbnail asset (none if empty)
+        cog (bool): Set to TRUE if the items contain COG files. Otherwise, GRIB2 files are expected.
 
     Returns:
         Collection: STAC Collection object
@@ -89,6 +94,7 @@ def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collect
     summaries = Summaries({})
     summaries.add(constants.EXT_PASS, [pass_no])
     summaries.add(constants.EXT_PERIOD, [period])
+    summaries.add("gsd", [constants.RESOLUTION_M])
 
     collection = Collection(
         stac_extensions=[constants.EXTENSION],
@@ -122,6 +128,32 @@ def create_collection(period: int, pass_no: int, thumbnail: str = "") -> Collect
                 media_type=media_type,
             ),
         )
+
+    data_asset: Dict[str, Any] = {"roles": constants.ASSET_ROLES, "type": ""}
+    if cog:
+        data_asset["type"] = MediaType.COG
+
+        # it seems the raster extension can't be added to an AssetDefintion
+        # RasterExtension.ext(data_asset, add_if_missing=True)
+        # RasterBand.create()
+        # etc. are not usable here
+        collection.stac_extensions.append(RASTER_EXTENSION)
+        band: Dict[str, Any] = {}
+        band["spatial_resolution"] = constants.RESOLUTION_M
+        band["unit"] = constants.UNIT
+        # band.nodata = dataset.nodatavals[0]
+        # band.data_type = DataType(dataset.dtypes[0])
+        data_asset["raster:bands"] = [band]
+    else:
+        data_asset["type"] = constants.GRIB_MEDIATYPE
+
+        collection.stac_extensions.append(constants.FILE_EXTENSION_V1)
+        data_asset["file:data_type"] = constants.GRIB_DATATYPE
+        data_asset["file:nodata"] = constants.GRIB_NODATA
+        data_asset["file:unit"] = constants.UNIT
+
+    item_assets_attrs = ItemAssetsExtension.ext(collection, add_if_missing=True)
+    item_assets_attrs.item_assets = {constants.ASSET_KEY: AssetDefinition(data_asset)}
 
     return collection
 
@@ -189,7 +221,7 @@ def create_item(
         media_type = MediaType.COG
         href = cog.convert(asset_href, unzip=basics["gzip"], reproject_to=crs)
     else:
-        media_type = "application/wmo-GRIB2"
+        media_type = constants.GRIB_MEDIATYPE
         if basics["gzip"]:
             href = cog.decompress(asset_href)
         else:
@@ -198,39 +230,37 @@ def create_item(
         # we have to use file extension v1.0.0 as no other extension
         # supports to specify multiple no-data values.
         # The GRIB files from NOAA have two no-data values though (-1, -3).
-        item.stac_extensions.append(
-            "https://stac-extensions.github.io/file/v1.0.0/schema.json"
-        )
+        item.stac_extensions.append(constants.FILE_EXTENSION_V1)
         extra_fields["file:data_type"] = constants.GRIB_DATATYPE
         extra_fields["file:nodata"] = constants.GRIB_NODATA
         extra_fields["file:unit"] = constants.UNIT
 
     # Add an asset to the item (COG for example)
     asset = Asset(
-        href=href, media_type=media_type, roles=["data"], extra_fields=extra_fields
+        href=href,
+        media_type=media_type,
+        roles=constants.ASSET_ROLES,
+        extra_fields=extra_fields,
     )
-    item.add_asset("data", asset)
+    item.add_asset(constants.ASSET_KEY, asset)
 
     ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
     ts_attrs.expires = basics["datetime"]
 
     shape = None
     if to_cog:
-        raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
-
-        bands = []
         with rasterio.open(href) as dataset:
             if len(dataset.shape) == 2:
                 shape = [dataset.shape[1], dataset.shape[0]]
-            for (i, _) in enumerate(dataset.indexes):
+            if len(dataset.indexes) == 1:
                 band = RasterBand.create()
                 band.spatial_resolution = constants.RESOLUTION_M
                 band.unit = constants.UNIT
-                band.nodata = dataset.nodatavals[i]
-                band.data_type = DataType(dataset.dtypes[i])
-                bands.append(band)
+                band.nodata = dataset.nodatavals[0]
+                band.data_type = DataType(dataset.dtypes[0])
 
-        raster_attrs.bands = bands
+                raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
+                raster_attrs.bands = [band]
     else:
         shape = constants.SHAPES[aoi]
 

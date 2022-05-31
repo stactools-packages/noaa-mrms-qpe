@@ -8,13 +8,13 @@
       "rel": "item",
       "href": "./item.json",
       "type": "application/geo+json",
-      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000 (COG)"
+      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
     },
     {
-      "rel": "item",
+      "rel": "related",
       "href": "./item_grib.json",
       "type": "application/geo+json",
-      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000 (GRIB)"
+      "title": "The COG item but exported as GRIB"
     },
     {
       "rel": "root",
@@ -47,9 +47,26 @@
     }
   ],
   "stac_extensions": [
-    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
-    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json"
+    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
+    "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
   ],
+  "item_assets": {
+    "data": {
+      "roles": [
+        "data"
+      ],
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "spatial_resolution": 1000,
+          "unit": "mm",
+	  "nodata": "nan",
+	  "data_type": "float64"
+        }
+      ]
+    }
+  },
   "title": "NOAA MRMS QPE 24-hour Pass 2",
   "extent": {
     "spatial": {
@@ -129,55 +146,15 @@
       "url": "https://github.com/stactools-packages/noaa-mrms-qpe"
     }
   ],
-  "item_assets": {
-    "data": {
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ],
-      "file:data_type": "float64",
-      "file:nodata": [-1,-3],
-      "file:unit": "mm",
-      "proj:epsg": null,
-      "proj:projjson": {
-        "$schema": "https://proj.org/schemas/v0.4/projjson.schema.json",
-        "type": "GeographicCRS",
-        "name": "unknown",
-        "datum": {
-          "type": "GeodeticReferenceFrame",
-          "name": "unknown",
-          "ellipsoid": {
-            "name": "unknown",
-            "semi_major_axis": 6378160,
-            "inverse_flattening": 298.253916296469
-          }
-        },
-        "coordinate_system": {
-          "subtype": "ellipsoidal",
-          "axis": [
-            {
-              "name": "Longitude",
-              "abbreviation": "lon",
-              "direction": "east",
-              "unit": "degree"
-            },
-            {
-              "name": "Latitude",
-              "abbreviation": "lat",
-              "direction": "north",
-              "unit": "degree"
-            }
-          ]
-        }
-      }
-    }
-  },
   "summaries": {
     "noaa_mrms_qpe:pass": [
       2
     ],
     "noaa_mrms_qpe:period": [
       24
+    ],
+    "gsd": [
+      1000
     ]
   }
 }

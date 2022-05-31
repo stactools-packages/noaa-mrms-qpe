@@ -44,19 +44,25 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         default="",
         help="URL for the collection thumbnail asset (none if empty)",
     )
+    @click.option(
+        "--cog",
+        default=False,
+        help="Set to TRUE if the items contain COG files. Otherwise, GRIB2 files are expected.",
+    )
     def create_collection_command(
         destination: str,
         period: int = 1,
         pass_no: int = 1,
         id: str = "",
         thumbnail: str = "",
+        cog: bool = False,
     ) -> None:
         """Creates a STAC Collection
 
         Args:
             destination (str): An HREF for the Collection JSON
         """
-        collection = stac.create_collection(period, pass_no, thumbnail)
+        collection = stac.create_collection(period, pass_no, thumbnail, cog)
         if len(id) > 0:
             collection.id = id
         collection.set_self_href(destination)
