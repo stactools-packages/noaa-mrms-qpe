@@ -8,7 +8,8 @@
 - Owner: @m-mohr
 - Dataset homepage: <https://mrms.nssl.noaa.gov>
 - STAC extensions used:
-  - [file v1.0.0](https://github.com/stac-extensions/file/) [may update to raster extension for COGs]
+  - [file v1.0.0](https://github.com/stac-extensions/file/) (for GRIB export)
+  - [raster](https://github.com/stac-extensions/raster/) (for COG export)
   - [proj](https://github.com/stac-extensions/projection/)
   - [timestamps](https://github.com/stac-extensions/timestamps/)
 - Extra fields:
@@ -19,7 +20,8 @@ A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Prec
 ## STAC Examples
 
 - [Collection](examples/collection.json)
-- [Item](examples/item/item.json)
+- [Item with a COG asset](examples/item/item.json)
+- [Item with a GRIB2 asset](examples/item/item_grib.json)
 
 ## Installation
 ```shell
@@ -44,10 +46,16 @@ stac noaa_mrms_qpe create-collection --help
 
 ### Item
 
-Create an item:
+Create an item for continentel US with a GRIB2 asset:
 
 ```shell
-stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item.json --aoi CONUS --collection collection.json --cog TRUE
+stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item_grib.json --collection collection.json
+```
+
+Create an item for ALASKA with a COG asset converted to EPSG:3857:
+
+```shell
+stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item.json --aoi ALASKA --collection collection.json --cog TRUE --epsg 3857
 ```
 
 Get information about all options for item creation:

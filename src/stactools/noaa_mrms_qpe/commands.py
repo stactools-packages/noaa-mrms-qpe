@@ -76,17 +76,19 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @click.option(
         "--collection",
         default="",
-        help="An HREF to the Collection JSON",
+        help="An HREF to the Collection JSON. "
+        "This adds the collection details to the item, but doesn't add the item to the collection.",
     )
     @click.option(
         "--cog",
         default=False,
-        help="Converts the GRIB2 file to COG",
+        help="Converts the GRIB2 file to COG if set to TRUE.",
     )
     @click.option(
         "--epsg",
         default=0,
-        help="Converts the COG files to the given EPSG Code (e.g. 3857)",
+        help="Converts the COG files to the given EPSG Code (e.g. 3857), "
+        "doesn't reproject by default",
     )
     def create_item_command(
         source: str,

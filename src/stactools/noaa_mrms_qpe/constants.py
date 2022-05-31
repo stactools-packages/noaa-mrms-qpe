@@ -85,3 +85,7 @@ PROJJSON = {
 }
 
 UNIT = "mm"
+RESOLUTION_M = 1000  # 1km
+
+GRIB_DATATYPE = "float64"
+GRIB_NODATA = [-1, -3]

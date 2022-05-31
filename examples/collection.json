@@ -8,7 +8,13 @@
       "rel": "item",
       "href": "./item.json",
       "type": "application/geo+json",
-      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
+      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000 (COG)"
+    },
+    {
+      "rel": "item",
+      "href": "./item_grib.json",
+      "type": "application/geo+json",
+      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000 (GRIB)"
     },
     {
       "rel": "root",

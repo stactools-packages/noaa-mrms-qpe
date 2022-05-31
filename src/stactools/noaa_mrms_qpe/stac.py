@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Union
 
+import rasterio
 from pystac import (
     Asset,
     CatalogType,
@@ -17,6 +18,7 @@ from pystac import (
     TemporalExtent,
 )
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.raster import DataType, RasterBand, RasterExtension
 from pystac.extensions.timestamps import TimestampsExtension
 
 from . import cog, constants
@@ -163,17 +165,11 @@ def create_item(
         constants.EXT_PASS: basics["pass_no"],
         constants.EXT_PERIOD: basics["period"],
         "description": description,
+        "gsd": constants.RESOLUTION_M,
     }
 
     item = Item(
-        stac_extensions=[
-            constants.EXTENSION,
-            # we have to use file extension v1.0.0 as no other extension
-            # supports to specify multiple no-data values.
-            # The GRIB files from NOAA have two no-data vlaues though (-1, -3).
-            # We can probably migrate to raster if to_cog is true.
-            "https://stac-extensions.github.io/file/v1.0.0/schema.json",
-        ],
+        stac_extensions=[constants.EXTENSION],
         id=id,
         properties=properties,
         geometry=bbox_to_polygon(bbox),
@@ -182,52 +178,71 @@ def create_item(
         collection=collection,
     )
 
-    if cog and epsg > 0:
-        crs = "epsg:" + str(epsg)
-    else:
-        crs = None
-
+    extra_fields: Dict[str, Any] = {}
+    crs = None
     media_type = ""
+    href = ""
+
     if to_cog:
+        if epsg > 0:
+            crs = "epsg:" + str(epsg)
         media_type = MediaType.COG
-        # todo
-        nodata = None
         href = cog.convert(asset_href, unzip=basics["gzip"], reproject_to=crs)
     else:
         media_type = "application/wmo-GRIB2"
-        nodata = [-1, -3]
         if basics["gzip"]:
             href = cog.decompress(asset_href)
         else:
             href = asset_href
 
+        # we have to use file extension v1.0.0 as no other extension
+        # supports to specify multiple no-data values.
+        # The GRIB files from NOAA have two no-data values though (-1, -3).
+        item.stac_extensions.append(
+            "https://stac-extensions.github.io/file/v1.0.0/schema.json"
+        )
+        extra_fields["file:data_type"] = constants.GRIB_DATATYPE
+        extra_fields["file:nodata"] = constants.GRIB_NODATA
+        extra_fields["file:unit"] = constants.UNIT
+
     # Add an asset to the item (COG for example)
     asset = Asset(
-        href=href,
-        media_type=media_type,
-        roles=["data"],
-        extra_fields={
-            # todo: check whether data type is correct
-            "file:data_type": "float64",
-            "file:nodata": nodata,
-            "file:unit": constants.UNIT,
-        },
+        href=href, media_type=media_type, roles=["data"], extra_fields=extra_fields
     )
     item.add_asset("data", asset)
 
     ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
     ts_attrs.expires = basics["datetime"]
 
-    # It is a good idea to include proj attributes to optimize for libs like stac-vrt
+    shape = None
+    if to_cog:
+        raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
+
+        bands = []
+        with rasterio.open(href) as dataset:
+            if len(dataset.shape) == 2:
+                shape = [dataset.shape[1], dataset.shape[0]]
+            for (i, _) in enumerate(dataset.indexes):
+                band = RasterBand.create()
+                band.spatial_resolution = constants.RESOLUTION_M
+                band.unit = constants.UNIT
+                band.nodata = dataset.nodatavals[i]
+                band.data_type = DataType(dataset.dtypes[i])
+                bands.append(band)
+
+        raster_attrs.bands = bands
+    else:
+        shape = constants.SHAPES[aoi]
+
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
-    if cog and epsg > 0:
+    if shape:
+        proj_attrs.shape = shape
+
+    if to_cog and epsg > 0:
         proj_attrs.epsg = epsg
-        # todo: set shape based on actual file dimensions
-        # proj_attrs.shape = ...
     else:
         proj_attrs.epsg = None
         proj_attrs.projjson = constants.PROJJSON
-        proj_attrs.shape = constants.SHAPES[aoi]
 
     return item
 
