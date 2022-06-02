@@ -73,6 +73,8 @@ stac noaa_mrms_qpe create-item --help
 
 Use `stac noaa-mrms-qpe --help` to see all subcommands and options.
 
+Note: This package can only read files that contain the timestamp in the file name. It can NOT read the files that contain `latest` instead of a timestamp in the file name.
+
 ## Contributing
 
 We use [pre-commit](https://pre-commit.com/) to check any changes.

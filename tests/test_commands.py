@@ -37,20 +37,21 @@ class CommandsTest(CliTestCase):
             # Run your custom create-item command and validate
 
             # Example:
-            id = "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
-            aoi = "HAWAII"
-            infile = f"/path/to/{id}.grib2"
+            id = "MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000"
+            folder = "GUAM"
+            infile = f"./tests/{folder}/{id}.grib2.gz"
             destination = os.path.join(tmp_dir, "item.json")
             result = self.run_command(
-                f"noaa_mrms_qpe create-item {infile} {destination} --aoi {aoi}"
+                f"noaa_mrms_qpe create-item {infile} {destination} --aoi {folder} --cog TRUE"
             )
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 
-            jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
+            files = os.listdir(tmp_dir)
+            jsons = [p for p in files if p.endswith(".json")]
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, f"{aoi}_{id}")
+            self.assertEqual(item.id, f"{folder}_{id}")
             # self.assertEqual(item.other_attr...
 
             item.validate()
