@@ -6,10 +6,17 @@
     "noaa_mrms_qpe:pass": 2,
     "noaa_mrms_qpe:period": 24,
     "description": "Multi-sensor accumulation 24-hour (2-hour latency) [mm]",
-    "gsd": 1000,
     "proj:shape": [
       7000,
       3500
+    ],
+    "proj:transform": [
+      0.009999999714244895,
+      0.0,
+      -129.99999999985712,
+      0.0,
+      -0.009999999714204058,
+      54.9999999998571
     ],
     "proj:epsg": null,
     "proj:projjson": {
@@ -91,6 +98,13 @@
       ],
       "file:unit": "mm",
       "expires": "2022-05-30T12:00:00Z",
+      "raster:bands": [
+        {
+          "spatial_resolution": 1000,
+          "unit": "mm",
+          "data_type": "float64"
+        }
+      ],
       "roles": [
         "data"
       ]
@@ -106,6 +120,7 @@
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
     "https://stac-extensions.github.io/file/v1.0.0/schema.json",
     "https://stac-extensions.github.io/timestamps/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
   ],
   "collection": "noaa-mrms-qpe-24h-pass2"

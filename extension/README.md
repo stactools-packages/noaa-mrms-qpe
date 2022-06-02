@@ -10,8 +10,8 @@
 This document explains the NOAA MRMS QPE Extension to the [SpatioTemporal Asset Catalog](https://github.com/radiantearth/stac-spec) (STAC) specification.
 
 - Examples:
-  - [Item example](../examples/item.json): Shows the basic usage of the extension in a STAC Item
-  - [Collection example](../examples/collection.json): Shows the basic usage of the extension in a STAC Collection
+  - [Item example](../examples/cog/item.json): Shows the basic usage of the extension in a STAC Item
+  - [Collection example](../examples/cog/collection.json): Shows the basic usage of the extension in a STAC Collection
 - [JSON Schema](schema.json)
 
 ## Item Properties and derived fields in Collections

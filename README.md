@@ -17,13 +17,18 @@
 
 A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Precipitation Estimation (QPE) dataset.
 
+This package can generate STAC files either for GRIB2 or COG assets.
+
 ## STAC Examples
 
-- [Collection](examples/collection.json)
-- [Item with a COG asset](examples/item/item.json)
-- [Item with a GRIB2 asset](examples/item/item_grib.json)
-
-[Browse the examples in a human-readable form](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/collection.json)
+- For COGs assets:
+  - [Collection](examples/cog/collection.json)
+  - [Item](examples/cog/item.json)
+  - [Browse the example in a human-readable form](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/cog/collection.json)
+- For GRIB2 assets:
+  - [Collection](examples/grib/collection.json)
+  - [Item](examples/grib/item.json)
+  - [Browse the example in a human-readable form](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/grib/collection.json)
 
 ## Installation
 ```shell

@@ -94,7 +94,6 @@ def create_collection(
     summaries = Summaries({})
     summaries.add(constants.EXT_PASS, [pass_no])
     summaries.add(constants.EXT_PERIOD, [period])
-    summaries.add("gsd", [constants.RESOLUTION_M])
 
     collection = Collection(
         stac_extensions=[constants.EXTENSION],
@@ -130,23 +129,25 @@ def create_collection(
         )
 
     data_asset: Dict[str, Any] = {"roles": constants.ASSET_ROLES, "type": ""}
+
+    # it seems the raster extension can't be added to an AssetDefintion
+    # RasterExtension.ext(data_asset, add_if_missing=True)
+    # RasterBand.create()
+    # etc. are not usable here
+    collection.stac_extensions.append(RASTER_EXTENSION)
+    band: Dict[str, Any] = {}
+    band["spatial_resolution"] = constants.RESOLUTION_M
+    band["unit"] = constants.UNIT
+    data_asset["raster:bands"] = [band]
+
     if cog:
         data_asset["type"] = MediaType.COG
-
-        # it seems the raster extension can't be added to an AssetDefintion
-        # RasterExtension.ext(data_asset, add_if_missing=True)
-        # RasterBand.create()
-        # etc. are not usable here
-        collection.stac_extensions.append(RASTER_EXTENSION)
-        band: Dict[str, Any] = {}
-        band["spatial_resolution"] = constants.RESOLUTION_M
-        band["unit"] = constants.UNIT
-        # band.nodata = dataset.nodatavals[0]
-        # band.data_type = DataType(dataset.dtypes[0])
-        data_asset["raster:bands"] = [band]
     else:
         data_asset["type"] = constants.GRIB_MEDIATYPE
 
+        # we have to use file extension v1.0.0 as no other extension
+        # supports to specify multiple no-data values.
+        # The GRIB files from NOAA have two no-data values though (-1, -3).
         collection.stac_extensions.append(constants.FILE_EXTENSION_V1)
         data_asset["file:data_type"] = constants.GRIB_DATATYPE
         data_asset["file:nodata"] = constants.GRIB_NODATA
@@ -197,7 +198,6 @@ def create_item(
         constants.EXT_PASS: basics["pass_no"],
         constants.EXT_PERIOD: basics["period"],
         "description": description,
-        "gsd": constants.RESOLUTION_M,
     }
 
     item = Item(
@@ -227,6 +227,7 @@ def create_item(
         else:
             href = asset_href
 
+    if not to_cog:
         # we have to use file extension v1.0.0 as no other extension
         # supports to specify multiple no-data values.
         # The GRIB files from NOAA have two no-data values though (-1, -3).
@@ -256,12 +257,13 @@ def create_item(
         if len(dataset.shape) == 2:
             shape = [dataset.shape[1], dataset.shape[0]]
 
-        if to_cog and len(dataset.indexes) == 1:
+        if len(dataset.indexes) == 1:
             band = RasterBand.create()
             band.spatial_resolution = constants.RESOLUTION_M
             band.unit = constants.UNIT
-            band.nodata = dataset.nodatavals[0]
             band.data_type = DataType(dataset.dtypes[0])
+            if to_cog:
+                band.nodata = dataset.nodatavals[0]
 
             raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
             raster_attrs.bands = [band]
