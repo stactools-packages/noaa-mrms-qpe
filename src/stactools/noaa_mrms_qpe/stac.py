@@ -138,10 +138,11 @@ def create_collection(
     band: Dict[str, Any] = {}
     band["spatial_resolution"] = constants.RESOLUTION_M
     band["unit"] = constants.UNIT
-    data_asset["raster:bands"] = [band]
 
     if cog:
         data_asset["type"] = MediaType.COG
+
+        band["nodata"] = constants.COG_NODATA
     else:
         data_asset["type"] = constants.GRIB_MEDIATYPE
 
@@ -152,6 +153,8 @@ def create_collection(
         data_asset["file:data_type"] = constants.GRIB_DATATYPE
         data_asset["file:nodata"] = constants.GRIB_NODATA
         data_asset["file:unit"] = constants.UNIT
+
+    data_asset["raster:bands"] = [band]
 
     item_assets_attrs = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_attrs.item_assets = {constants.ASSET_KEY: AssetDefinition(data_asset)}
@@ -263,7 +266,7 @@ def create_item(
             band.unit = constants.UNIT
             band.data_type = DataType(dataset.dtypes[0])
             if to_cog:
-                band.nodata = dataset.nodatavals[0]
+                band.nodata = constants.COG_NODATA
 
             raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
             raster_attrs.bands = [band]

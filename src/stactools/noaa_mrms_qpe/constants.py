@@ -84,5 +84,7 @@ GRIB_DATATYPE = "float64"
 GRIB_NODATA = [-1, -3]
 GRIB_MEDIATYPE = "application/wmo-GRIB2"
 
+COG_NODATA = -1
+
 ASSET_KEY = "data"
 ASSET_ROLES = ["data"]

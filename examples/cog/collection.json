@@ -54,7 +54,8 @@
       "raster:bands": [
         {
           "spatial_resolution": 1000,
-          "unit": "mm"
+          "unit": "mm",
+          "nodata": -1
         }
       ]
     }

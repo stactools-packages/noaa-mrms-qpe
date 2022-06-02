@@ -63,10 +63,10 @@
       "expires": "2022-05-30T12:00:00Z",
       "raster:bands": [
         {
-          "nodata": -1,
           "spatial_resolution": 1000,
           "unit": "mm",
-          "data_type": "float64"
+          "data_type": "float64",
+          "nodata": -1
         }
       ],
       "roles": [
