@@ -1,4 +1,8 @@
 tests/*/*.tif
+tests/ALASKA/*.grib2
+tests/CARIB/*.grib2
+tests/CONUS/*.grib2
+tests/GUAM/*.grib2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

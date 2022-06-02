@@ -15,9 +15,6 @@ class CommandsTest(CliTestCase):
 
     def test_create_collection(self) -> None:
         with TemporaryDirectory() as tmp_dir:
-            # Run your custom create-collection command and validate
-
-            # Example:
             destination = os.path.join(tmp_dir, "collection.json")
 
             result = self.run_command(f"noaa_mrms_qpe create-collection {destination}")
@@ -34,9 +31,6 @@ class CommandsTest(CliTestCase):
 
     def test_create_item(self) -> None:
         with TemporaryDirectory() as tmp_dir:
-            # Run your custom create-item command and validate
-
-            # Example:
             id = "MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000"
             folder = "GUAM"
             infile = f"./tests/{folder}/{id}.grib2.gz"
