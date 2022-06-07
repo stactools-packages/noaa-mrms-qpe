@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import rasterio
+from fileinfo import FileInfo
 from pystac import (
     Asset,
     CatalogType,
@@ -173,17 +174,17 @@ def create_item(
     """
 
     basics = parse_filename(asset_href)
-    id = aoi + "_" + basics["id"]
+    id = aoi + "_" + basics.id
 
     bbox = constants.EXTENTS[aoi]
 
     description = "Multi-sensor accumulation {p}-hour ({t}-hour latency) [mm]".format(
-        p=basics["period"], t=basics["pass_no"]
+        p=basics.period, t=basics.pass_no
     )
 
     properties = {
-        constants.EXT_PASS: basics["pass_no"],
-        constants.EXT_PERIOD: basics["period"],
+        constants.EXT_PASS: basics.pass_no,
+        constants.EXT_PERIOD: basics.period,
         "description": description,
     }
 
@@ -193,7 +194,7 @@ def create_item(
         properties=properties,
         geometry=bbox_to_polygon(bbox),
         bbox=bbox,
-        datetime=basics["datetime"],
+        datetime=basics.datetime,
         collection=collection,
     )
 
@@ -206,10 +207,10 @@ def create_item(
         if epsg > 0:
             crs = "epsg:" + str(epsg)
         media_type = MediaType.COG
-        href = cog.convert(asset_href, unzip=basics["gzip"], reproject_to=crs)
+        href = cog.convert(asset_href, unzip=basics.gzip, reproject_to=crs)
     else:
         media_type = constants.GRIB_MEDIATYPE
-        if basics["gzip"]:
+        if basics.gzip:
             href = cog.decompress(asset_href)
         else:
             href = asset_href
@@ -233,7 +234,7 @@ def create_item(
     item.add_asset(constants.ASSET_KEY, asset)
 
     ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
-    ts_attrs.expires = basics["datetime"]
+    ts_attrs.expires = basics.datetime
 
     shape = None
     transform = None
@@ -271,7 +272,7 @@ def create_item(
     return item
 
 
-def parse_filename(path: str) -> Dict[str, Any]:
+def parse_filename(path: str) -> FileInfo:
     filename = os.path.basename(path)
     parts = constants.FILENAME_PATTERN.match(filename)
     if parts is None:
@@ -283,13 +284,13 @@ def parse_filename(path: str) -> Dict[str, Any]:
     hour = int(parts.group(7))
     time = datetime(year, month, day, hour, tzinfo=timezone.utc)
 
-    return {
-        "id": parts.group(1),
-        "period": int(parts.group(2)),
-        "pass_no": int(parts.group(3)),
-        "datetime": time,
-        "gzip": False if parts.group(8) is None else True,
-    }
+    return FileInfo(
+        id=parts.group(1),
+        period=int(parts.group(2)),
+        pass_no=int(parts.group(3)),
+        datetime=time,
+        gzip=False if parts.group(8) is None else True,
+    )
 
 
 def bbox_to_polygon(b: List[float]) -> Dict[str, Any]:
