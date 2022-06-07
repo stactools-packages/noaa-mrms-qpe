@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import rasterio
-from fileinfo import FileInfo
 from pystac import (
     Asset,
     CatalogType,
@@ -18,11 +17,9 @@ from pystac import (
 )
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.projection import ProjectionExtension
-from pystac.extensions.raster import SCHEMA_URI as RASTER_EXTENSION
-from pystac.extensions.raster import DataType, RasterBand, RasterExtension
-from pystac.extensions.timestamps import TimestampsExtension
 
 from . import cog, constants
+from .fileinfo import FileInfo
 
 logger = logging.getLogger(__name__)
 
@@ -113,13 +110,12 @@ def create_collection(
             ),
         )
 
-    data_asset: Dict[str, Any] = {"roles": constants.ASSET_ROLES, "type": ""}
+    data_asset: Dict[str, Any] = {"roles": constants.ASSET_DATA_ROLES, "type": ""}
 
     # it seems the raster extension can't be added to an AssetDefintion
-    # RasterExtension.ext(data_asset, add_if_missing=True)
-    # RasterBand.create()
-    # etc. are not usable here
-    collection.stac_extensions.append(RASTER_EXTENSION)
+    # via RasterExtension.ext(data_asset, add_if_missing=True).
+    # So RasterBand.create() etc. are not usable here
+    collection.stac_extensions.append(constants.RASTER_EXTENSION_V11)
     band: Dict[str, Any] = {}
     band["spatial_resolution"] = constants.RESOLUTION_M
     band["unit"] = constants.UNIT
@@ -128,6 +124,7 @@ def create_collection(
         data_asset["type"] = MediaType.COG
 
         band["nodata"] = constants.COG_NODATA
+        band["data_type"] = constants.COG_DATA_DATATYPE
     else:
         data_asset["type"] = constants.GRIB_MEDIATYPE
 
@@ -141,8 +138,28 @@ def create_collection(
 
     data_asset["raster:bands"] = [band]
 
+    item_assets = {constants.ASSET_DATA_KEY: AssetDefinition(data_asset)}
+
+    if cog:
+        # Classification extension v1.1 is not supported by PySTAC (1.4.0) yet
+        collection.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
+
+        mask_band: Dict[str, Any] = {}
+        mask_band["spatial_resolution"] = constants.RESOLUTION_M
+        mask_band["nodata"] = constants.COG_NODATA
+        mask_band["data_type"] = constants.COG_MASK_DATATYPE
+        mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
+
+        mask_asset: Dict[str, Any] = {
+            "roles": constants.ASSET_MASK_ROLES,
+            "type": MediaType.COG,
+            "raster:bands": [mask_band],
+        }
+
+        item_assets[constants.ASSET_MASK_KEY] = AssetDefinition(mask_asset)
+
     item_assets_attrs = ItemAssetsExtension.ext(collection, add_if_missing=True)
-    item_assets_attrs.item_assets = {constants.ASSET_KEY: AssetDefinition(data_asset)}
+    item_assets_attrs.item_assets = item_assets
 
     return collection
 
@@ -207,7 +224,7 @@ def create_item(
         if epsg > 0:
             crs = "epsg:" + str(epsg)
         media_type = MediaType.COG
-        href = cog.convert(asset_href, unzip=basics.gzip, reproject_to=crs)
+        href, mask_href = cog.convert(asset_href, unzip=basics.gzip, reproject_to=crs)
     else:
         media_type = constants.GRIB_MEDIATYPE
         if basics.gzip:
@@ -228,13 +245,10 @@ def create_item(
     asset = Asset(
         href=href,
         media_type=media_type,
-        roles=constants.ASSET_ROLES,
+        roles=constants.ASSET_DATA_ROLES,
         extra_fields=extra_fields,
     )
-    item.add_asset(constants.ASSET_KEY, asset)
-
-    ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
-    ts_attrs.expires = basics.datetime
+    item.add_asset(constants.ASSET_DATA_KEY, asset)
 
     shape = None
     transform = None
@@ -245,16 +259,36 @@ def create_item(
         if len(dataset.shape) == 2:
             shape = [dataset.shape[1], dataset.shape[0]]
 
-        if len(dataset.indexes) == 1:
-            band = RasterBand.create()
-            band.spatial_resolution = constants.RESOLUTION_M
-            band.unit = constants.UNIT
-            band.data_type = DataType(dataset.dtypes[0])
-            if to_cog:
-                band.nodata = constants.COG_NODATA
+    band: Dict[str, Any] = {}
+    band["spatial_resolution"] = constants.RESOLUTION_M
+    band["unit"] = constants.UNIT
+    band["data_type"] = constants.COG_DATA_DATATYPE
+    if to_cog:
+        band["nodata"] = constants.COG_NODATA
 
-            raster_attrs = RasterExtension.ext(asset, add_if_missing=True)
-            raster_attrs.bands = [band]
+    # We need to specify the raster extension manually here
+    # as version 1.1 is not supported by PySTAC (1.4.0) yet
+    # but we need to set "nan" as no-data value which is
+    # only available in raster extension v1.1
+    item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
+    asset.extra_fields["raster:bands"] = [band]
+
+    if to_cog and mask_href:
+        mask_asset = Asset(
+            href=mask_href, media_type=MediaType.COG, roles=constants.ASSET_MASK_ROLES
+        )
+
+        # Classification extension v1.1 is not supported by PySTAC (1.4.0) yet
+        item.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
+
+        mask_band: Dict[str, Any] = {}
+        mask_band["spatial_resolution"] = constants.RESOLUTION_M
+        mask_band["data_type"] = constants.COG_MASK_DATATYPE
+        mask_band["nodata"] = constants.COG_NODATA
+        mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
+        mask_asset.extra_fields["raster:bands"] = [mask_band]
+
+        item.add_asset(constants.ASSET_MASK_KEY, mask_asset)
 
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
     if shape:

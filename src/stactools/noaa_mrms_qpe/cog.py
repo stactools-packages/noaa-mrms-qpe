@@ -3,7 +3,7 @@ import logging
 import os
 import shutil
 from tempfile import TemporaryDirectory
-from typing import Optional
+from typing import List, Optional
 
 from stactools.core.utils.subprocess import call
 
@@ -12,12 +12,15 @@ from . import constants
 logger = logging.getLogger(__name__)
 
 
-def convert(href: str, unzip: bool = False, reproject_to: Optional[str] = None) -> str:
+def convert(
+    href: str, unzip: bool = False, reproject_to: Optional[str] = None
+) -> List[str]:
 
     dir = os.path.dirname(href)
     name = os.path.splitext(os.path.basename(href))[0]
     if unzip:
         name = os.path.splitext(name)[0]
+    mask_name = name + "-mask.tif"
     name = name + ".tif"
 
     with TemporaryDirectory() as tmp_dir:
@@ -27,11 +30,13 @@ def convert(href: str, unzip: bool = False, reproject_to: Optional[str] = None) 
         if reproject_to:
             href = reproject(href, os.path.join(tmp_dir, name), reproject_to)
 
-        href = cogify(href, os.path.join(dir, name))
+        href, output_mask_path = cogify(
+            href, os.path.join(dir, name), os.path.join(dir, mask_name)
+        )
 
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    return href
+    return [href, output_mask_path]
 
 
 def decompress(input_path: str, tmp_dir: Optional[str] = None) -> str:
@@ -56,8 +61,8 @@ def reproject(input_path: str, output_path: str, crs: str) -> str:
     return output_path
 
 
-def cogify(input_path: str, output_path: str) -> str:
-    print(f"cogifying {input_path} to {output_path}")
+def cogify(input_path: str, output_path: str, output_mask_path: str) -> List[str]:
+    print(f"cogifying {input_path} to {output_path} and {output_mask_path}")
     call(
         [
             "gdal_calc.py",
@@ -65,8 +70,9 @@ def cogify(input_path: str, output_path: str) -> str:
             input_path,
             "--outfile",
             output_path,
+            "--overwrite",
             "--calc",
-            f"maximum(A, {constants.COG_NODATA})",
+            "A*(A>=0)",
             "--NoDataValue",
             str(constants.COG_NODATA),
             "--format",
@@ -76,8 +82,34 @@ def cogify(input_path: str, output_path: str) -> str:
             "--co",
             "COPY_SRC_OVERVIEWS=YES",
             "--co",
-            "COMPRESS=LZW"
+            f"COMPRESS={constants.COG_COMPRESS}"
             # "--co", f"TARGET_SRS={reproject_to}"
         ]
     )
-    return output_path
+    call(
+        [
+            "gdal_calc.py",
+            "-A",
+            input_path,
+            "--outfile",
+            output_mask_path,
+            "--overwrite",
+            "--calc",
+            "A*(A<0)",
+            "--NoDataValue",
+            str(constants.COG_NODATA),
+            "--type",
+            "Int16",
+            "--format",
+            "GTIFF",  # COG
+            "--co",
+            "TILED=YES",
+            "--co",
+            "COPY_SRC_OVERVIEWS=YES",
+            "--co",
+            f"COMPRESS={constants.COG_COMPRESS}"
+            # "--co", f"TARGET_SRS={reproject_to}"
+        ]
+    )
+    hrefs: List[str] = [output_path, output_mask_path]
+    return hrefs

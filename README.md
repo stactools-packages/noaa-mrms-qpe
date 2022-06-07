@@ -11,13 +11,13 @@
   - [file v1.0.0](https://github.com/stac-extensions/file/) (for GRIB export)
   - [raster](https://github.com/stac-extensions/raster/) (for COG export)
   - [proj](https://github.com/stac-extensions/projection/)
-  - [timestamps](https://github.com/stac-extensions/timestamps/)
 - Extra fields:
   - See [NOAA MRMS QPE extension](./extension/README.md) for details
 
 A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Precipitation Estimation (QPE) dataset.
 
-This package can generate STAC files either for GRIB2 or COG assets.
+This package can generate STAC files from (gzipped) GRIB2 files and that either link to the original GRIB2 files or
+to cloud-optimized GeoTiffs (COGs) in the original or any other EPSG projection.
 
 ## STAC Examples
 

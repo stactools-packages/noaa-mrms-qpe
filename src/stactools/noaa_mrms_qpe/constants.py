@@ -1,12 +1,17 @@
 import re
 
 from pystac import Link, Provider, ProviderRole, RelType
+from pystac.extensions.raster import DataType
 
 EXTENSION = (
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"
     "/main/extension/schema.json"
 )
 FILE_EXTENSION_V1 = "https://stac-extensions.github.io/file/v1.0.0/schema.json"
+RASTER_EXTENSION_V11 = "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+CLASSIFICATION_EXTENSION_V11 = (
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
+)
 
 EXT_PASS = "noaa_mrms_qpe:pass"
 EXT_PERIOD = "noaa_mrms_qpe:period"
@@ -90,7 +95,17 @@ GRIB_DATATYPE = "float64"
 GRIB_NODATA = [-1, -3]
 GRIB_MEDIATYPE = "application/wmo-GRIB2"
 
-COG_NODATA = -1
+COG_NODATA = "nan"
+COG_COMPRESS = "LZW"
+COG_DATA_DATATYPE = DataType.FLOAT64
+COG_MASK_DATATYPE = DataType.INT16
 
-ASSET_KEY = "data"
-ASSET_ROLES = ["data"]
+ASSET_DATA_KEY = "data"
+ASSET_DATA_ROLES = ["data"]
+ASSET_MASK_KEY = "mask"
+ASSET_MASK_ROLES = ["metadata", "data-mask"]
+
+MASK_CLASSIFICATION = [
+    {"value": -1, "name": "missing-value", "description": "Missing value"},
+    {"value": -3, "name": "no-coverage", "description": "No coverage"},
+]

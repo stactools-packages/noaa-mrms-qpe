@@ -97,7 +97,6 @@
         -3
       ],
       "file:unit": "mm",
-      "expires": "2022-05-30T12:00:00Z",
       "raster:bands": [
         {
           "spatial_resolution": 1000,
@@ -119,7 +118,6 @@
   "stac_extensions": [
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
     "https://stac-extensions.github.io/file/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/timestamps/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
   ],
