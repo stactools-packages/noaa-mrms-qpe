@@ -76,7 +76,7 @@ def cogify(input_path: str, output_path: str) -> str:
             "--co",
             "COPY_SRC_OVERVIEWS=YES",
             "--co",
-            "COMPRESS=LZW"
+            f"COMPRESS={constants.COG_COMPRESS}"
             # "--co", f"TARGET_SRS={reproject_to}"
         ]
     )
