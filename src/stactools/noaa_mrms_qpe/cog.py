@@ -29,8 +29,6 @@ def convert(href: str, unzip: bool = False, reproject_to: Optional[str] = None) 
 
         href = cogify(href, os.path.join(dir, name))
 
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-
     return href
 
 

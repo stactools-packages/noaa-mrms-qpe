@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import rasterio
-from fileinfo import FileInfo
 from pystac import (
     Asset,
     CatalogType,
@@ -22,6 +21,7 @@ from pystac.extensions.raster import SCHEMA_URI as RASTER_EXTENSION
 from pystac.extensions.raster import DataType, RasterBand, RasterExtension
 
 from . import cog, constants
+from .fileinfo import FileInfo
 
 logger = logging.getLogger(__name__)
 
