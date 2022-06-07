@@ -78,7 +78,7 @@
       "raster:bands": [
         {
           "spatial_resolution": 1000,
-          "data_type": "int8",
+          "data_type": "int16",
           "nodata": 0,
           "classification:classes": [
             {
