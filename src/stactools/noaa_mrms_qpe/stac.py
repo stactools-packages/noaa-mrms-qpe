@@ -20,7 +20,6 @@ from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.projection import ProjectionExtension
 from pystac.extensions.raster import SCHEMA_URI as RASTER_EXTENSION
 from pystac.extensions.raster import DataType, RasterBand, RasterExtension
-from pystac.extensions.timestamps import TimestampsExtension
 
 from . import cog, constants
 
@@ -232,9 +231,6 @@ def create_item(
         extra_fields=extra_fields,
     )
     item.add_asset(constants.ASSET_KEY, asset)
-
-    ts_attrs = TimestampsExtension.ext(asset, add_if_missing=True)
-    ts_attrs.expires = basics.datetime
 
     shape = None
     transform = None

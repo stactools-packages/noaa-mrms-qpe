@@ -119,7 +119,6 @@
   "stac_extensions": [
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
     "https://stac-extensions.github.io/file/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/timestamps/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
   ],
