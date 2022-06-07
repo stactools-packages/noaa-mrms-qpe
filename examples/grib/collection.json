@@ -135,14 +135,6 @@
         "licensor"
       ],
       "url": "https://www.nssl.noaa.gov/projects/mrms"
-    },
-    {
-      "name": "Stactools",
-      "description": "Conversion from GRIB to COG files",
-      "roles": [
-        "processor"
-      ],
-      "url": "https://github.com/stactools-packages/noaa-mrms-qpe"
     }
   ],
   "summaries": {

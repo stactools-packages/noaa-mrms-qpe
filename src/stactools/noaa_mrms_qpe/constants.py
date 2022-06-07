@@ -1,8 +1,6 @@
 import re
 
-from pystac import Link, RelType
-
-REPOSITORY = "https://github.com/stactools-packages/noaa-mrms-qpe"
+from pystac import Link, Provider, ProviderRole, RelType
 
 EXTENSION = (
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"
@@ -21,6 +19,14 @@ EXTENTS = {
     "ALASKA": [-176.0, 50.0, -126.0, 72.0],  # Alaska
     "CARIB": [-90.0, 10.0, -60.0, 25.0],  # Caribbean
 }
+
+PROVIDERS = [
+    Provider(
+        name="NOAA National Severe Storms Laboratory",
+        roles=[ProviderRole.PRODUCER, ProviderRole.LICENSOR],
+        url="https://www.nssl.noaa.gov/projects/mrms",
+    ),
+]
 
 LINK_LICENSE = Link(
     target="https://www.nssl.noaa.gov/projects/mrms/nmq_data_policy_OGCrevised.pdf",

@@ -11,8 +11,6 @@ from pystac import (
     Extent,
     Item,
     MediaType,
-    Provider,
-    ProviderRole,
     SpatialExtent,
     Summaries,
     TemporalExtent,
@@ -42,20 +40,6 @@ def create_collection(
     Returns:
         Collection: STAC Collection object
     """
-    providers = [
-        Provider(
-            name="NOAA National Severe Storms Laboratory",
-            roles=[ProviderRole.PRODUCER, ProviderRole.LICENSOR],
-            url="https://www.nssl.noaa.gov/projects/mrms",
-        ),
-        Provider(
-            name="Stactools",
-            roles=[ProviderRole.PROCESSOR],
-            description="Conversion from GRIB to COG files",
-            url=constants.REPOSITORY,
-        ),
-    ]
-
     # Time must be in UTC
     demo_time = datetime.now(tz=timezone.utc)
 
@@ -102,7 +86,7 @@ def create_collection(
         description=description.format(t=period),
         keywords=keywords,
         license="proprietary",
-        providers=providers,
+        providers=constants.PROVIDERS,
         extent=extent,
         summaries=summaries,
         catalog_type=CatalogType.RELATIVE_PUBLISHED,
