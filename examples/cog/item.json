@@ -65,7 +65,7 @@
           "spatial_resolution": 1000,
           "unit": "mm",
           "data_type": "float64",
-          "nodata": "nan"
+          "nodata": -1
         }
       ],
       "roles": [
@@ -79,7 +79,7 @@
         {
           "spatial_resolution": 1000,
           "data_type": "int8",
-          "nodata": "nan",
+          "nodata": 0,
           "classification:classes": [
             {
               "value": -1,

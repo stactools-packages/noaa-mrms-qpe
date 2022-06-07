@@ -8,8 +8,9 @@
 - Owner: @m-mohr
 - Dataset homepage: <https://mrms.nssl.noaa.gov>
 - STAC extensions used:
+  - [classification v1.1.0](https://github.com/stac-extensions/classification/) (for COG masks)
   - [file v1.0.0](https://github.com/stac-extensions/file/) (for GRIB export)
-  - [raster](https://github.com/stac-extensions/raster/) (for COG export)
+  - [raster v1.1.0](https://github.com/stac-extensions/raster/) (for COG export)
   - [proj](https://github.com/stac-extensions/projection/)
 - Extra fields:
   - See [NOAA MRMS QPE extension](./extension/README.md) for details

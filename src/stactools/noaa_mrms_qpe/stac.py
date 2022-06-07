@@ -123,7 +123,7 @@ def create_collection(
     if cog:
         data_asset["type"] = MediaType.COG
 
-        band["nodata"] = constants.COG_NODATA
+        band["nodata"] = constants.COG_DATA_NODATA
         band["data_type"] = constants.COG_DATA_DATATYPE
     else:
         data_asset["type"] = constants.GRIB_MEDIATYPE
@@ -146,7 +146,7 @@ def create_collection(
 
         mask_band: Dict[str, Any] = {}
         mask_band["spatial_resolution"] = constants.RESOLUTION_M
-        mask_band["nodata"] = constants.COG_NODATA
+        mask_band["nodata"] = constants.COG_MASK_NODATA
         mask_band["data_type"] = constants.COG_MASK_DATATYPE
         mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
 
@@ -264,12 +264,9 @@ def create_item(
     band["unit"] = constants.UNIT
     band["data_type"] = constants.COG_DATA_DATATYPE
     if to_cog:
-        band["nodata"] = constants.COG_NODATA
+        band["nodata"] = constants.COG_DATA_NODATA
 
-    # We need to specify the raster extension manually here
-    # as version 1.1 is not supported by PySTAC (1.4.0) yet
-    # but we need to set "nan" as no-data value which is
-    # only available in raster extension v1.1
+    # Raster extension v1.1 not supported by PySTAC
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
     asset.extra_fields["raster:bands"] = [band]
 
@@ -284,7 +281,7 @@ def create_item(
         mask_band: Dict[str, Any] = {}
         mask_band["spatial_resolution"] = constants.RESOLUTION_M
         mask_band["data_type"] = constants.COG_MASK_DATATYPE
-        mask_band["nodata"] = constants.COG_NODATA
+        mask_band["nodata"] = constants.COG_MASK_NODATA
         mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
         mask_asset.extra_fields["raster:bands"] = [mask_band]
 

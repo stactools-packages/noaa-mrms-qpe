@@ -56,7 +56,7 @@
         {
           "spatial_resolution": 1000,
           "unit": "mm",
-          "nodata": "nan",
+          "nodata": -1,
           "data_type": "float64"
         }
       ]
@@ -71,7 +71,7 @@
         {
           "spatial_resolution": 1000,
           "data_type": "int8",
-          "nodata": "nan",
+          "nodata": 0,
           "classification:classes": [
             {
               "value": -1,
