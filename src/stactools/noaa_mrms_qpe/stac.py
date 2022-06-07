@@ -1,7 +1,7 @@
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional
 
 import rasterio
 from pystac import (
@@ -165,7 +165,7 @@ def create_collection(
 def create_item(
     asset_href: str,
     aoi: str = "CONUS",
-    collection: Union[Collection, None] = None,
+    collection: Optional[Collection] = None,
     to_cog: bool = False,
     epsg: int = 0,
 ) -> Item:

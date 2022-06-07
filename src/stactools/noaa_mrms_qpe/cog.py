@@ -3,7 +3,7 @@ import logging
 import os
 import shutil
 from tempfile import TemporaryDirectory
-from typing import Union
+from typing import Optional
 
 from stactools.core.utils.subprocess import call
 
@@ -12,9 +12,7 @@ from . import constants
 logger = logging.getLogger(__name__)
 
 
-def convert(
-    href: str, unzip: bool = False, reproject_to: Union[str, None] = None
-) -> str:
+def convert(href: str, unzip: bool = False, reproject_to: Optional[str] = None) -> str:
 
     dir = os.path.dirname(href)
     name = os.path.splitext(os.path.basename(href))[0]
@@ -36,7 +34,7 @@ def convert(
     return href
 
 
-def decompress(input_path: str, tmp_dir: Union[str, None] = None) -> str:
+def decompress(input_path: str, tmp_dir: Optional[str] = None) -> str:
     if tmp_dir is None:
         output_path = os.path.splitext(input_path)[0]
     else:
