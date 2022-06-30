@@ -88,7 +88,7 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @click.option(
         "--cog",
         default=False,
-        help="Converts the GRIB2 file to COG if set to TRUE.",
+        help="Converts the GRIB2 file to two COG files (data and mask) if set to TRUE.",
     )
     @click.option(
         "--epsg",

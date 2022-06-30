@@ -97,7 +97,6 @@
         -3
       ],
       "file:unit": "mm",
-      "expires": "2022-05-30T12:00:00Z",
       "raster:bands": [
         {
           "spatial_resolution": 1000,
