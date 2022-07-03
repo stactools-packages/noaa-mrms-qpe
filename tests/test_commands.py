@@ -36,7 +36,7 @@ class CommandsTest(CliTestCase):
             infile = f"./tests/{folder}/{id}.grib2.gz"
             destination = os.path.join(tmp_dir, "item.json")
             result = self.run_command(
-                f"noaa_mrms_qpe create-item {infile} {destination} --aoi {folder} --cog TRUE"
+                f"noaa_mrms_qpe create-item {infile} {destination} --aoi {folder} --nogrib TRUE"
             )
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 

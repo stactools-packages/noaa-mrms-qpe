@@ -1,7 +1,7 @@
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import rasterio
 from pystac import (
@@ -17,6 +17,7 @@ from pystac import (
 )
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.raster import DataType
 
 from . import cog, constants
 from .fileinfo import FileInfo
@@ -25,26 +26,37 @@ logger = logging.getLogger(__name__)
 
 
 def create_collection(
-    period: int, pass_no: int, thumbnail: str = "", cog: bool = False
+    period: int,
+    pass_no: int,
+    thumbnail: str = "",
+    nocog: bool = False,
+    nogrib: bool = False,
+    start_time: Optional[str] = None,
 ) -> Collection:
     """Create a STAC Collection for NOAA MRMS QPE sub-products.
 
     Args:
         period (int): The time period the sub-product is for (either 1, 3, 6, 12, 24, 48, or 72)
         pass_no (int): The pass number of the sub-product (either 1 or 2)
-        thumbnail (str): URL for the collection thumbnail asset (none if empty)
-        cog (bool): Set to TRUE if the items contain COG files. Otherwise, GRIB2 files are expected.
+        thumbnail (str): URL for the PNG or JPEG collection thumbnail asset (none if empty)
+        nocog (bool): If set to True, the collections does not include the COG-related metadata
+        nogrib (bool): If set to True, the collections does not include the GRIB2-related metadata
+        start_time (str): The start timestamp for the temporal extent, default to now.
+            Timestamps consist of a date and time in UTC and must follow RFC 3339, section 5.6.
 
     Returns:
         Collection: STAC Collection object
     """
     # Time must be in UTC
-    demo_time = datetime.now(tz=timezone.utc)
+    if start_time is None:
+        start_datetime = datetime.now(tz=timezone.utc)
+    else:
+        start_datetime = datetime.fromisoformat(start_time)
 
     spatial_extents = list(constants.EXTENTS.values())
     extent = Extent(
         SpatialExtent(spatial_extents),
-        TemporalExtent([[demo_time, None]]),
+        TemporalExtent([[start_datetime, None]]),
     )
 
     keywords = [
@@ -56,20 +68,26 @@ def create_collection(
         "precipitation",
         "{t}-hour".format(t=period),
     ]
+    if not nogrib:
+        keywords.append("GRIB2")
+    if not nocog:
+        keywords.append("COG")
 
     description = (
         "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation "
         "(QPE) product is generated fully automatically from multiple sources to generate "
         "seamless, hourly 1 km mosaics over the US.\n\n"
+        "**Note:** The data for Guam and the Caribbean Islands are [no Multi-Sensor QPE products]"
+        "(https://vlab.noaa.gov/documents/96675/666999/MS_DomainDiffernces.png) yet."
     )
     if pass_no == 1:
         description += (
-            "This is the {t}-hour pass 1 product with less latency (60 min), "
+            "\n\nThis is the {t}-hour pass 1 product with less latency (60 min), "
             "but less gauges (60-65 %)."
         )
     elif pass_no == 2:
         description += (
-            "This is the {t}-hour pass 2 product with more latency (120 min), "
+            "\n\nThis is the {t}-hour pass 2 product with more latency (120 min), "
             "but more gauges (99 %)."
         )
 
@@ -110,53 +128,28 @@ def create_collection(
             ),
         )
 
-    data_asset: Dict[str, Any] = {"roles": constants.ASSET_DATA_ROLES, "type": ""}
+    item_assets = {}
 
     # it seems the raster extension can't be added to an AssetDefintion
     # via RasterExtension.ext(data_asset, add_if_missing=True).
     # So RasterBand.create() etc. are not usable here
     collection.stac_extensions.append(constants.RASTER_EXTENSION_V11)
-    band: Dict[str, Any] = {}
-    band["spatial_resolution"] = constants.RESOLUTION_M
-    band["unit"] = constants.UNIT
 
-    if cog:
-        data_asset["type"] = MediaType.COG
-
-        band["nodata"] = constants.COG_DATA_NODATA
-        band["data_type"] = constants.COG_DATA_DATATYPE
-    else:
-        data_asset["type"] = constants.GRIB_MEDIATYPE
-
-        # we have to use file extension v1.0.0 as no other extension
-        # supports to specify multiple no-data values.
-        # The GRIB files from NOAA have two no-data values though (-1, -3).
-        collection.stac_extensions.append(constants.FILE_EXTENSION_V1)
-        data_asset["file:data_type"] = constants.GRIB_DATATYPE
-        data_asset["file:nodata"] = constants.GRIB_NODATA
-        data_asset["file:unit"] = constants.UNIT
-
-    data_asset["raster:bands"] = [band]
-
-    item_assets = {constants.ASSET_DATA_KEY: AssetDefinition(data_asset)}
-
-    if cog:
-        # Classification extension v1.1 is not supported by PySTAC (1.4.0) yet
-        collection.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
-
-        mask_band: Dict[str, Any] = {}
-        mask_band["spatial_resolution"] = constants.RESOLUTION_M
-        mask_band["nodata"] = constants.COG_MASK_NODATA
-        mask_band["data_type"] = constants.COG_MASK_DATATYPE
-        mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
-
-        mask_asset: Dict[str, Any] = {
-            "roles": constants.ASSET_MASK_ROLES,
-            "type": MediaType.COG,
-            "raster:bands": [mask_band],
+    def create_asset(media_type: str, roles: List[str]) -> Dict[str, Any]:
+        asset: Dict[str, Any] = {
+            "roles": roles,
+            "type": media_type,
+            "raster:bands": [create_band()],
         }
+        return asset
 
-        item_assets[constants.ASSET_MASK_KEY] = AssetDefinition(mask_asset)
+    if not nocog:
+        asset = create_asset(MediaType.COG, constants.COG_ROLES)
+        item_assets[constants.ASSET_COG_KEY] = AssetDefinition(asset)
+
+    if not nogrib:
+        asset = create_asset(constants.GRIB2_MEDIATYPE, constants.GRIB2_ROLES)
+        item_assets[constants.ASSET_GRIB2_KEY] = AssetDefinition(asset)
 
     item_assets_attrs = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_attrs.item_assets = item_assets
@@ -168,7 +161,8 @@ def create_item(
     asset_href: str,
     aoi: str = "CONUS",
     collection: Optional[Collection] = None,
-    to_cog: bool = False,
+    nocog: bool = False,
+    nogrib: bool = False,
     epsg: int = 0,
 ) -> Item:
     """Create a STAC Item
@@ -183,8 +177,10 @@ def create_item(
         aoi (str): The area of interest, either 'ALASKA', 'CONUS' (continental US, default),
             'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'
         collection (pystac.Collection): HREF to an existing collection
-        to_cog (bool): Converts the GRIB2 files to COG if set to true.
-            Defaults to false, which keeps the file as is.
+        nocog (bool): If set to True, no COG file is generated for the Item
+        nogrib (bool): If set to True, the GRIB2 file is not added to the Item
+        epsg (int): Converts the COG files to the given EPSG Code (e.g. 3857),
+            doesn't reproject by default.
 
     Returns:
         Item: STAC Item object
@@ -215,90 +211,82 @@ def create_item(
         collection=collection,
     )
 
-    extra_fields: Dict[str, Any] = {}
-    crs = None
-    media_type = ""
-    href = ""
-
-    if to_cog:
-        if epsg > 0:
-            crs = "epsg:" + str(epsg)
-        media_type = MediaType.COG
-        href, mask_href = cog.convert(asset_href, unzip=basics.gzip, reproject_to=crs)
-    else:
-        media_type = constants.GRIB_MEDIATYPE
-        if basics.gzip:
-            href = cog.decompress(asset_href)
-        else:
-            href = asset_href
-
-    if not to_cog:
-        # we have to use file extension v1.0.0 as no other extension
-        # supports to specify multiple no-data values.
-        # The GRIB files from NOAA have two no-data values though (-1, -3).
-        item.stac_extensions.append(constants.FILE_EXTENSION_V1)
-        extra_fields["file:data_type"] = constants.GRIB_DATATYPE
-        extra_fields["file:nodata"] = constants.GRIB_NODATA
-        extra_fields["file:unit"] = constants.UNIT
-
-    # Add an asset to the item (COG for example)
-    asset = Asset(
-        href=href,
-        media_type=media_type,
-        roles=constants.ASSET_DATA_ROLES,
-        extra_fields=extra_fields,
-    )
-    item.add_asset(constants.ASSET_DATA_KEY, asset)
-
-    shape = None
-    transform = None
-    with rasterio.open(href) as dataset:
-        if dataset.transform:
-            transform = list(dataset.transform)[0:6]
-
-        if len(dataset.shape) == 2:
-            shape = [dataset.shape[1], dataset.shape[0]]
-
-    band: Dict[str, Any] = {}
-    band["spatial_resolution"] = constants.RESOLUTION_M
-    band["unit"] = constants.UNIT
-    band["data_type"] = constants.COG_DATA_DATATYPE
-    if to_cog:
-        band["nodata"] = constants.COG_DATA_NODATA
-
     # Raster extension v1.1 not supported by PySTAC
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
-    asset.extra_fields["raster:bands"] = [band]
+    # Classification extension v1.1 not supported by PySTAC
+    # item.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
 
-    if to_cog and mask_href:
-        mask_asset = Asset(
-            href=mask_href, media_type=MediaType.COG, roles=constants.ASSET_MASK_ROLES
-        )
-
-        # Classification extension v1.1 is not supported by PySTAC (1.4.0) yet
-        item.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
-
-        mask_band: Dict[str, Any] = {}
-        mask_band["spatial_resolution"] = constants.RESOLUTION_M
-        mask_band["data_type"] = constants.COG_MASK_DATATYPE
-        mask_band["nodata"] = constants.COG_MASK_NODATA
-        mask_band["classification:classes"] = constants.MASK_CLASSIFICATION
-        mask_asset.extra_fields["raster:bands"] = [mask_band]
-
-        item.add_asset(constants.ASSET_MASK_KEY, mask_asset)
-
+    # Projection extension for assets
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
-    if shape:
-        proj_attrs.shape = shape
-
-    if transform:
-        proj_attrs.transform = transform
-
-    if to_cog and epsg > 0:
-        proj_attrs.epsg = epsg
-    else:
+    # Set CRS details globally if they are the same for COG and GRIB or only one of them is exposed
+    if epsg == 0 or nocog or nogrib:
         proj_attrs.epsg = None
         proj_attrs.projjson = constants.PROJJSON
+
+    def create_asset(
+        href: str,
+        media_type: str,
+        roles: List[str],
+        band: Dict[str, Any],
+        crs: Union[Dict[str, Any], int],
+    ) -> Asset:
+        asset = Asset(
+            href=href,
+            media_type=media_type,
+            roles=roles,
+        )
+
+        shape = None
+        transform = None
+        with rasterio.open(href) as dataset:
+            if dataset.transform:
+                transform = list(dataset.transform)[0:6]
+
+            if len(dataset.shape) == 2:
+                shape = [dataset.shape[1], dataset.shape[0]]
+
+        proj_attrs = ProjectionExtension.ext(asset, add_if_missing=False)
+        if shape:
+            proj_attrs.shape = shape
+
+        if transform:
+            proj_attrs.transform = transform
+
+        if epsg > 0 and not nogrib and not nocog:
+            if isinstance(crs, int):
+                proj_attrs.epsg = crs
+            else:
+                proj_attrs.epsg = None
+                proj_attrs.projjson = crs
+
+        asset.extra_fields["raster:bands"] = [band]
+
+        return asset
+
+    if basics.gzip:
+        asset_href = cog.decompress(asset_href)
+
+    if not nocog:
+        epsg_string = "epsg:" + str(epsg) if epsg > 0 else None
+        crs: Union[Dict[str, Any], int] = epsg if epsg > 0 else constants.PROJJSON
+        cog_href = cog.convert(asset_href, reproject_to=epsg_string)
+
+        band = create_band()
+        band["nodata"] = constants.COG_NODATA
+
+        asset = create_asset(cog_href, MediaType.COG, constants.COG_ROLES, band, crs)
+        item.add_asset(constants.ASSET_COG_KEY, asset)
+
+    if not nogrib:
+        band = create_band()
+        asset = create_asset(
+            asset_href,
+            constants.GRIB2_MEDIATYPE,
+            constants.GRIB2_ROLES,
+            band,
+            constants.PROJJSON,
+        )
+        item.add_asset(constants.ASSET_GRIB2_KEY, asset)
 
     return item
 
@@ -331,3 +319,11 @@ def bbox_to_polygon(b: List[float]) -> Dict[str, Any]:
             [[b[0], b[3]], [b[2], b[3]], [b[2], b[1]], [b[0], b[1]], [b[0], b[3]]]
         ],
     }
+
+
+def create_band() -> Dict[str, Any]:
+    band: Dict[str, Any] = {}
+    band["spatial_resolution"] = constants.RESOLUTION_M
+    band["unit"] = constants.UNIT
+    band["data_type"] = DataType.FLOAT64
+    return band

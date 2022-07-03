@@ -4,6 +4,8 @@ tests/CARIB/*.grib2
 tests/CONUS/*.grib2
 tests/GUAM/*.grib2
 
+/MRMS_*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

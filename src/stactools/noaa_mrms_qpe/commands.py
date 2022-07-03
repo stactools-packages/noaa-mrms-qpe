@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 import click
 from click import Command, Group
@@ -42,12 +43,23 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @click.option(
         "--thumbnail",
         default="",
-        help="URL for the collection thumbnail asset (none if empty)",
+        help="URL for the PNG or JPEG collection thumbnail asset (none if empty)",
     )
     @click.option(
-        "--cog",
+        "--nocog",
         default=False,
-        help="Set to TRUE if the items contain COG files. Otherwise, GRIB2 files are expected.",
+        help="Does not include the COG-related metadata in the collection if set to `TRUE`.",
+    )
+    @click.option(
+        "--nogrib",
+        default=False,
+        help="Does not include the GRIB2-related metadata in the collection if set to `TRUE`.",
+    )
+    @click.option(
+        "--start_time",
+        default=None,
+        help="The start timestamp for the temporal extent, defaults to now. "
+        "Timestamps consist of a date and time in UTC and must be follow RFC 3339, section 5.6.",
     )
     def create_collection_command(
         destination: str,
@@ -55,14 +67,18 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         pass_no: int = 1,
         id: str = "",
         thumbnail: str = "",
-        cog: bool = False,
+        nocog: bool = False,
+        nogrib: bool = False,
+        start_time: Optional[str] = None,
     ) -> None:
         """Creates a STAC Collection
 
         Args:
             destination (str): An HREF for the Collection JSON
         """
-        collection = stac.create_collection(period, pass_no, thumbnail, cog)
+        collection = stac.create_collection(
+            period, pass_no, thumbnail, nocog, nogrib, start_time
+        )
         if len(id) > 0:
             collection.id = id
         collection.set_self_href(destination)
@@ -86,9 +102,14 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         "This adds the collection details to the item, but doesn't add the item to the collection.",
     )
     @click.option(
-        "--cog",
+        "--nocog",
         default=False,
-        help="Converts the GRIB2 file to two COG files (data and mask) if set to TRUE.",
+        help="Does not create a COG file for the given GRIB2 file if set to `TRUE`.",
+    )
+    @click.option(
+        "--nogrib",
+        default=False,
+        help="Does not include the GRIB2 file in the created metadata if set to `TRUE`.",
     )
     @click.option(
         "--epsg",
@@ -101,7 +122,8 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         destination: str,
         aoi: str = "CONUS",
         collection: str = "",
-        cog: bool = False,
+        nocog: bool = False,
+        nogrib: bool = False,
         epsg: int = 0,
     ) -> None:
         """Creates a STAC Item
@@ -114,7 +136,7 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
         if len(collection) > 0:
             stac_collection = Collection.from_file(collection)
 
-        item = stac.create_item(source, aoi, stac_collection, cog, epsg)
+        item = stac.create_item(source, aoi, stac_collection, nocog, nogrib, epsg)
         item.save_object(dest_href=destination)
 
         return None

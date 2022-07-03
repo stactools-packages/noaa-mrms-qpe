@@ -85,6 +85,6 @@ class StacTest(unittest.TestCase):
                     dt[0], dt[1], dt[2], dt[3], 0, 0, 0, tzinfo=timezone.utc  # type: ignore
                 )
                 self.assertEqual(item.datetime, ref_dt)
-                self.assertEqual(len(item.assets), 1)
+                self.assertEqual(len(item.assets), 2)
 
                 item.validate()

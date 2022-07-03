@@ -2,7 +2,7 @@
   "type": "Collection",
   "id": "noaa-mrms-qpe-24h-pass2",
   "stac_version": "1.0.0",
-  "description": "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation (QPE) product is generated fully automatically from multiple sources to generate seamless, hourly 1 km mosaics over the US.\n\nThis is the 24-hour pass 2 product with more latency (120 min), but more gauges (99 %).",
+  "description": "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation (QPE) product is generated fully automatically from multiple sources to generate seamless, hourly 1 km mosaics over the US.\n\n**Note:** The data for Guam and the Caribbean Islands are [no Multi-Sensor QPE products](https://vlab.noaa.gov/documents/96675/666999/MS_DomainDiffernces.png) yet.\n\nThis is the 24-hour pass 2 product with more latency (120 min), but more gauges (99 %).",
   "links": [
     {
       "rel": "item",
@@ -36,54 +36,41 @@
     },
     {
       "rel": "self",
-      "href": "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/cog/collection.json",
+      "href": "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/collection.json",
       "type": "application/json"
     }
   ],
   "stac_extensions": [
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
-    "https://stac-extensions.github.io/classification/v1.1.0/schema.json",
     "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
   ],
   "item_assets": {
-    "data": {
+    "cog": {
       "roles": [
-        "data"
+        "data",
+        "cloud-optimized"
       ],
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "spatial_resolution": 1000,
           "unit": "mm",
-          "nodata": -1,
           "data_type": "float64"
         }
       ]
     },
-    "mask": {
+    "grib2": {
       "roles": [
-        "metadata",
-        "data-mask"
+        "data",
+        "source"
       ],
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "type": "application/wmo-GRIB2",
       "raster:bands": [
         {
           "spatial_resolution": 1000,
-          "data_type": "int16",
-          "nodata": 0,
-          "classification:classes": [
-            {
-              "value": -1,
-              "name": "missing-value",
-              "description": "Missing value"
-            },
-            {
-              "value": -3,
-              "name": "no-coverage",
-              "description": "No coverage"
-            }
-          ]
+          "unit": "mm",
+          "data_type": "float64"
         }
       ]
     }
@@ -147,7 +134,9 @@
     "multi-radar",
     "multi-sensor",
     "precipitation",
-    "24-hour"
+    "24-hour",
+    "GRIB2",
+    "COG"
   ],
   "providers": [
     {

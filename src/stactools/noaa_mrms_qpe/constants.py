@@ -1,13 +1,12 @@
 import re
+from typing import Any, Dict
 
 from pystac import Link, Provider, ProviderRole, RelType
-from pystac.extensions.raster import DataType
 
 EXTENSION = (
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"
     "/main/extension/schema.json"
 )
-FILE_EXTENSION_V1 = "https://stac-extensions.github.io/file/v1.0.0/schema.json"
 RASTER_EXTENSION_V11 = "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
 CLASSIFICATION_EXTENSION_V11 = (
     "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
@@ -56,7 +55,7 @@ FILENAME_PATTERN = re.compile(
     r"^(MRMS_MultiSensor_QPE_(\d{2})H_Pass(\d)_\d+\.\d+_(\d{4})(\d{2})(\d{2})-(\d{2})0000)\.grib2(\.gz)?$"  # noqa: E501
 )
 
-PROJJSON = {
+PROJJSON: Dict[str, Any] = {
     "$schema": "https://proj.org/schemas/v0.4/projjson.schema.json",
     "type": "GeographicCRS",
     "name": "unknown",
@@ -91,22 +90,34 @@ PROJJSON = {
 UNIT = "mm"
 RESOLUTION_M = 1000  # 1km
 
-GRIB_DATATYPE = "float64"
-GRIB_NODATA = [-1, -3]
-GRIB_MEDIATYPE = "application/wmo-GRIB2"
+ASSET_GRIB2_KEY = "grib2"
+GRIB2_NODATA = [-1, -3]
+GRIB2_MEDIATYPE = "application/wmo-GRIB2"
+GRIB2_ROLES = ["data", "source"]
+GRIB2_CLASSIFICATION = [
+    {
+        "value": -1,
+        "name": "missing-value",
+        "description": "Missing value (no-data)",
+        "nodata": True,
+    },
+    {
+        "value": -3,
+        "name": "no-coverage",
+        "description": "No coverage (no-data)",
+        "nodata": True,
+    },
+]
 
+ASSET_COG_KEY = "cog"
 COG_COMPRESS = "LZW"
-COG_DATA_DATATYPE = DataType.FLOAT64
-COG_DATA_NODATA = -1
-COG_MASK_DATATYPE = DataType.INT16
-COG_MASK_NODATA = 0
-
-ASSET_DATA_KEY = "data"
-ASSET_DATA_ROLES = ["data"]
-ASSET_MASK_KEY = "mask"
-ASSET_MASK_ROLES = ["metadata", "data-mask"]
-
-MASK_CLASSIFICATION = [
-    {"value": -1, "name": "missing-value", "description": "Missing value"},
-    {"value": -3, "name": "no-coverage", "description": "No coverage"},
+COG_NODATA = -1
+COG_ROLES = ["data", "cloud-optimized"]
+COG_CLASSIFICATION = [
+    {
+        "value": -1,
+        "name": "no-data",
+        "description": "No coverage or missing value (no-data)",
+        "nodata": True,
+    }
 ]
