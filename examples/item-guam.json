@@ -29,8 +29,8 @@
           9.0
         ],
         [
-          -130.0,
-          55.0
+          140.0,
+          18.0
         ]
       ]
     ]
@@ -47,6 +47,7 @@
     "cog": {
       "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220704-140000.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Processed Cloud-optimized GeoTiff file",
       "proj:shape": [
         1974,
         1829
@@ -69,7 +70,6 @@
             "minimum": 0.0,
             "maximum": 83.800048828125
           },
-          "nodata": -1,
           "classification:classes": [
             {
               "value": -1,
@@ -77,7 +77,8 @@
               "description": "No coverage or missing value (no-data)",
               "nodata": true
             }
-          ]
+          ],
+          "nodata": -1
         }
       ],
       "roles": [
@@ -88,6 +89,7 @@
     "grib2": {
       "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220704-140000.grib2",
       "type": "application/wmo-GRIB2",
+      "title": "Original GRIB2 file",
       "proj:shape": [
         2000,
         1800

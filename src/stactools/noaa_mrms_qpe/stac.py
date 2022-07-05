@@ -136,20 +136,27 @@ def create_collection(
     # So RasterBand.create() etc. are not usable here
     collection.stac_extensions.append(constants.RASTER_EXTENSION_V11)
 
-    def create_asset(media_type: str, roles: List[str]) -> Dict[str, Any]:
+    def create_asset(media_type: str, roles: List[str], title: str) -> Dict[str, Any]:
         asset: Dict[str, Any] = {
             "roles": roles,
             "type": media_type,
             "raster:bands": [create_band()],
+            "title": title,
         }
         return asset
 
     if not nocog:
-        asset = create_asset(MediaType.COG, constants.COG_ROLES)
+        asset = create_asset(
+            MediaType.COG, constants.COG_ROLES, constants.ASSET_COG_TITLE
+        )
         item_assets[constants.ASSET_COG_KEY] = AssetDefinition(asset)
 
     if not nogrib:
-        asset = create_asset(constants.GRIB2_MEDIATYPE, constants.GRIB2_ROLES)
+        asset = create_asset(
+            constants.GRIB2_MEDIATYPE,
+            constants.GRIB2_ROLES,
+            constants.ASSET_GRIB2_TITLE,
+        )
         item_assets[constants.ASSET_GRIB2_KEY] = AssetDefinition(asset)
 
     item_assets_attrs = ItemAssetsExtension.ext(collection, add_if_missing=True)
@@ -230,12 +237,9 @@ def create_item(
         roles: List[str],
         band: Dict[str, Any],
         crs: Union[Dict[str, Any], int],
+        title: str,
     ) -> Asset:
-        asset = Asset(
-            href=href,
-            media_type=media_type,
-            roles=roles,
-        )
+        asset = Asset(href=href, media_type=media_type, roles=roles, title=title)
 
         isGRIB2 = media_type == constants.GRIB2_MEDIATYPE
 
@@ -249,7 +253,7 @@ def create_item(
                 shape = [dataset.shape[1], dataset.shape[0]]
 
             data = dataset.read()
-            valid_data = np.ma.masked_array(data, mask=(data < 0))
+            valid_data = np.ma.masked_array(data, mask=(data < 0))  # type: ignore
 
             band["statistics"] = {
                 "minimum": np.nanmin(valid_data),
@@ -267,11 +271,12 @@ def create_item(
                     classes.append(constants.GRIB2_CLASSIFICATION[2])
             elif np.any(data == -1.0):
                 classes.append(constants.COG_CLASSIFICATION)
-                band["nodata"] = -1
 
             if len(classes) > 0:
                 band["classification:classes"] = classes
                 # band["classification:incomplete"] = True
+            if len(classes) == 1:
+                band["nodata"] = band["classification:classes"][0]["value"]
 
         proj_attrs = ProjectionExtension.ext(asset, add_if_missing=False)
         if shape:
@@ -301,7 +306,14 @@ def create_item(
 
         band = create_band()
 
-        asset = create_asset(cog_href, MediaType.COG, constants.COG_ROLES, band, crs)
+        asset = create_asset(
+            cog_href,
+            MediaType.COG,
+            constants.COG_ROLES,
+            band,
+            crs,
+            constants.ASSET_COG_TITLE,
+        )
         item.add_asset(constants.ASSET_COG_KEY, asset)
 
     if not nogrib:
@@ -313,6 +325,7 @@ def create_item(
             constants.GRIB2_ROLES,
             band,
             constants.PROJJSON,
+            constants.ASSET_GRIB2_TITLE,
         )
         item.add_asset(constants.ASSET_GRIB2_KEY, asset)
 

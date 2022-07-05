@@ -47,6 +47,7 @@
     "cog": {
       "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220702-110000.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Processed Cloud-optimized GeoTiff file",
       "proj:shape": [
         6553,
         4279
@@ -79,6 +80,7 @@
     "grib2": {
       "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220702-110000.grib2",
       "type": "application/wmo-GRIB2",
+      "title": "Original GRIB2 file",
       "proj:shape": [
         7000,
         3500

@@ -64,7 +64,8 @@
           "unit": "mm",
           "data_type": "float64"
         }
-      ]
+      ],
+      "title": "Processed Cloud-optimized GeoTiff file"
     },
     "grib2": {
       "roles": [
@@ -78,7 +79,8 @@
           "unit": "mm",
           "data_type": "float64"
         }
-      ]
+      ],
+      "title": "Original GRIB2 file"
     }
   },
   "title": "NOAA MRMS QPE 24-hour Pass 2",
@@ -126,7 +128,7 @@
     "temporal": {
       "interval": [
         [
-          "2022-05-30T12:00:00Z",
+          "2022-07-01T00:00:00Z",
           null
         ]
       ]

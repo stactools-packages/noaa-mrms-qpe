@@ -91,6 +91,7 @@ UNIT = "mm"
 RESOLUTION_M = 1000  # 1km
 
 ASSET_GRIB2_KEY = "grib2"
+ASSET_GRIB2_TITLE = "Original GRIB2 file"
 GRIB2_NODATA = [-1, -3]
 GRIB2_MEDIATYPE = "application/wmo-GRIB2"
 GRIB2_ROLES = ["data", "source"]
@@ -116,6 +117,7 @@ GRIB2_CLASSIFICATION = [
 ]
 
 ASSET_COG_KEY = "cog"
+ASSET_COG_TITLE = "Processed Cloud-optimized GeoTiff file"
 COG_COMPRESS = "LZW"
 COG_NODATA = -1
 COG_ROLES = ["data", "cloud-optimized"]
