@@ -274,6 +274,8 @@ def create_item(
 
             if len(classes) > 0:
                 band["classification:classes"] = classes
+                # Add this if it gets accepted in v1.2:
+                # see https://github.com/stac-extensions/classification/pull/34
                 # band["classification:incomplete"] = True
             if len(classes) == 1:
                 band["nodata"] = band["classification:classes"][0]["value"]
