@@ -6,9 +6,15 @@
   "links": [
     {
       "rel": "item",
-      "href": "./item.json",
+      "href": "./item-conus.json",
       "type": "application/geo+json",
-      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000"
+      "title": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220702-110000"
+    },
+    {
+      "rel": "item",
+      "href": "./item-guam.json",
+      "type": "application/geo+json",
+      "title": "GUAM_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220704-140000"
     },
     {
       "rel": "root",

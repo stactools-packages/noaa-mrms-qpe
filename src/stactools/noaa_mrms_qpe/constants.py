@@ -107,17 +107,21 @@ GRIB2_CLASSIFICATION = [
         "description": "No coverage (no-data)",
         "nodata": True,
     },
+    {
+        "value": -999,
+        "name": "no-coverage",
+        "description": "No coverage (no-data)",
+        "nodata": True,
+    },
 ]
 
 ASSET_COG_KEY = "cog"
 COG_COMPRESS = "LZW"
 COG_NODATA = -1
 COG_ROLES = ["data", "cloud-optimized"]
-COG_CLASSIFICATION = [
-    {
-        "value": -1,
-        "name": "no-data",
-        "description": "No coverage or missing value (no-data)",
-        "nodata": True,
-    }
-]
+COG_CLASSIFICATION = {
+    "value": -1,
+    "name": "no-data",
+    "description": "No coverage or missing value (no-data)",
+    "nodata": True,
+}

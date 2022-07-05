@@ -65,18 +65,10 @@
           "spatial_resolution": 1000,
           "unit": "mm",
           "data_type": "float64",
-          "nodata": -1,
           "statistics": {
-            "minimum": 0
-          },
-          "classification:classes": [
-            {
-              "value": -1,
-              "name": "no-data",
-              "description": "No coverage or missing value (no-data)",
-              "nodata": true
-            }
-          ]
+            "minimum": 0.0,
+            "maximum": 281.0
+          }
         }
       ],
       "roles": [
@@ -137,22 +129,9 @@
           "unit": "mm",
           "data_type": "float64",
           "statistics": {
-            "minimum": 0
-          },
-          "classification:classes": [
-            {
-              "value": -1,
-              "name": "missing-value",
-              "description": "Missing value (no-data)",
-              "nodata": true
-            },
-            {
-              "value": -3,
-              "name": "no-coverage",
-              "description": "No coverage (no-data)",
-              "nodata": true
-            }
-          ]
+            "minimum": 0.0,
+            "maximum": 284.3999938964844
+          }
         }
       ],
       "roles": [

@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Union
 
+import numpy as np
 import rasterio
 from pystac import (
     Asset,
@@ -236,6 +237,8 @@ def create_item(
             roles=roles,
         )
 
+        isGRIB2 = media_type == constants.GRIB2_MEDIATYPE
+
         shape = None
         transform = None
         with rasterio.open(href) as dataset:
@@ -244,6 +247,31 @@ def create_item(
 
             if len(dataset.shape) == 2:
                 shape = [dataset.shape[1], dataset.shape[0]]
+
+            data = dataset.read()
+            valid_data = np.ma.masked_array(data, mask=(data < 0))
+
+            band["statistics"] = {
+                "minimum": np.nanmin(valid_data),
+                "maximum": np.nanmax(valid_data),
+            }
+
+            classes = []
+            if isGRIB2:
+                if np.any(data == -1.0):
+                    classes.append(constants.GRIB2_CLASSIFICATION[0])
+                if np.any(data == -3.0):
+                    classes.append(constants.GRIB2_CLASSIFICATION[1])
+                # some old files contain -999 as nodata value
+                if np.any(data == -999.0):
+                    classes.append(constants.GRIB2_CLASSIFICATION[2])
+            elif np.any(data == -1.0):
+                classes.append(constants.COG_CLASSIFICATION)
+                band["nodata"] = -1
+
+            if len(classes) > 0:
+                band["classification:classes"] = classes
+                # band["classification:incomplete"] = True
 
         proj_attrs = ProjectionExtension.ext(asset, add_if_missing=False)
         if shape:
@@ -272,21 +300,12 @@ def create_item(
         cog_href = cog.convert(asset_href, reproject_to=epsg_string)
 
         band = create_band()
-        # todo: generate the following from the files instead of hardcoding it?
-        band["nodata"] = constants.COG_NODATA
-        band["statistics"] = {"minimum": 0}
-        band["classification:classes"] = constants.COG_CLASSIFICATION
-        # band["classification:incomplete"] = True
 
         asset = create_asset(cog_href, MediaType.COG, constants.COG_ROLES, band, crs)
         item.add_asset(constants.ASSET_COG_KEY, asset)
 
     if not nogrib:
         band = create_band()
-        # todo: generate the following from the files instead of hardcoding it?
-        band["statistics"] = {"minimum": 0}
-        band["classification:classes"] = constants.GRIB2_CLASSIFICATION
-        # band["classification:incomplete"] = True
 
         asset = create_asset(
             asset_href,

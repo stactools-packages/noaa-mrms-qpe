@@ -22,7 +22,8 @@ to cloud-optimized GeoTiffs (COGs) in the original or any other EPSG projection.
 ## STAC Examples
 
 - [Collection](examples/collection.json)
-- [Item](examples/item.json)
+- [Item for continental US](examples/item-conus.json)
+- [Item for GUAM](examples/item-guam.json)
 - [Browse the example in a human-readable form](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/examples/collection.json)
 
 ## Installation
