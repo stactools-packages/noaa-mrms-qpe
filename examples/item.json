@@ -69,7 +69,6 @@
           "statistics": {
             "minimum": 0
           },
-          "classification:incomplete": true,
           "classification:classes": [
             {
               "value": -1,
@@ -140,7 +139,6 @@
           "statistics": {
             "minimum": 0
           },
-          "classification:incomplete": true,
           "classification:classes": [
             {
               "value": -1,

@@ -214,7 +214,7 @@ def create_item(
     # Raster extension v1.1 not supported by PySTAC
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
     # Classification extension v1.1 not supported by PySTAC
-    # item.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
+    item.stac_extensions.append(constants.CLASSIFICATION_EXTENSION_V11)
 
     # Projection extension for assets
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
@@ -272,13 +272,22 @@ def create_item(
         cog_href = cog.convert(asset_href, reproject_to=epsg_string)
 
         band = create_band()
+        # todo: generate the following from the files instead of hardcoding it?
         band["nodata"] = constants.COG_NODATA
+        band["statistics"] = {"minimum": 0}
+        band["classification:classes"] = constants.COG_CLASSIFICATION
+        # band["classification:incomplete"] = True
 
         asset = create_asset(cog_href, MediaType.COG, constants.COG_ROLES, band, crs)
         item.add_asset(constants.ASSET_COG_KEY, asset)
 
     if not nogrib:
         band = create_band()
+        # todo: generate the following from the files instead of hardcoding it?
+        band["statistics"] = {"minimum": 0}
+        band["classification:classes"] = constants.GRIB2_CLASSIFICATION
+        # band["classification:incomplete"] = True
+
         asset = create_asset(
             asset_href,
             constants.GRIB2_MEDIATYPE,
