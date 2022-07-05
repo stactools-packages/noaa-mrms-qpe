@@ -1,10 +1,14 @@
 import unittest
 from datetime import datetime, timezone
+from typing import Any, Dict
 
 from stactools.noaa_mrms_qpe import stac
 
 PERIODS = [1, 3, 6, 12, 24, 48, 72]
 PASS_NUMBERS = [1, 2]
+
+COG_MEDIATYPE = "image/tiff; application=geotiff; profile=cloud-optimized"
+GRIB_MEDIATYPE = "application/wmo-GRIB2"
 
 TEST_FILES = [
     [
@@ -58,12 +62,46 @@ class StacTest(unittest.TestCase):
                     collection = stac.create_collection(period=period, pass_no=pass_no)
                     collection.set_self_href("")
 
+                    collection_dict = collection.to_dict()
+
                     self.assertEqual(
-                        collection.id, f"noaa-mrms-qpe-{period}h-pass{pass_no}"
+                        collection.summaries.get_list("noaa_mrms_qpe:pass"), [pass_no]
                     )
-                    summaries = collection.summaries.to_dict()
-                    self.assertEqual(summaries["noaa_mrms_qpe:pass"], [pass_no])
-                    self.assertEqual(summaries["noaa_mrms_qpe:period"], [period])
+                    self.assertEqual(
+                        collection.summaries.get_list("noaa_mrms_qpe:period"), [period]
+                    )
+
+                    # self.assertTrue("item_assets" in collection)
+                    # self.assertTrue("data" in collection["item_assets"])
+
+                    assets: Dict[str, Dict[str, Any]] = collection_dict["item_assets"]
+                    self.assertEqual(len(assets), 2)
+
+                    # Check COG asset
+                    cog_asset = assets["cog"]
+                    self.assertEqual(cog_asset["type"], COG_MEDIATYPE)
+                    self.assertTrue("raster:bands" in cog_asset)
+                    self.assertEqual(len(cog_asset["raster:bands"]), 1)
+                    cog_band = cog_asset["raster:bands"][0]
+                    self.assertEqual(cog_band["spatial_resolution"], 1000)
+                    self.assertEqual(cog_band["unit"], "mm")
+                    self.assertEqual(cog_band["data_type"], "float64")
+                    self.assertFalse("classification:classes" in cog_band)
+                    self.assertFalse("nodata" in cog_band)
+
+                    # Check GRIB2 asset
+                    grib_asset = assets["grib2"]
+                    self.assertEqual(grib_asset["type"], GRIB_MEDIATYPE)
+                    self.assertTrue("raster:bands" in grib_asset)
+                    self.assertEqual(len(grib_asset["raster:bands"]), 1)
+                    grib_band = grib_asset["raster:bands"][0]
+                    self.assertEqual(grib_band["spatial_resolution"], 1000)
+                    self.assertEqual(grib_band["unit"], "mm")
+                    self.assertEqual(grib_band["data_type"], "float64")
+                    self.assertFalse("classification:classes" in grib_band)
+                    self.assertFalse("nodata" in grib_band)
+
+                    # todo check item assets
 
                     collection.validate()
 
@@ -86,5 +124,31 @@ class StacTest(unittest.TestCase):
                 )
                 self.assertEqual(item.datetime, ref_dt)
                 self.assertEqual(len(item.assets), 2)
+
+                # Check COG asset
+                cog_asset = item.assets["cog"].to_dict()
+                self.assertEqual(cog_asset["type"], COG_MEDIATYPE)
+                self.assertTrue("raster:bands" in cog_asset)
+                self.assertEqual(len(cog_asset["raster:bands"]), 1)
+                cog_band = cog_asset["raster:bands"][0]
+                self.assertEqual(cog_band["spatial_resolution"], 1000)
+                self.assertEqual(cog_band["unit"], "mm")
+                self.assertEqual(cog_band["data_type"], "float64")
+                # self.assertTrue("classification:classes" in cog_band)
+                # self.assertEqual(len(cog_band["classification:classes"]), 1)
+                # self.assertEqual(cog_band["nodata"], -1)
+
+                # Check GRIB2 asset
+                grib_asset = item.assets["grib2"].to_dict()
+                self.assertEqual(grib_asset["type"], GRIB_MEDIATYPE)
+                self.assertTrue("raster:bands" in grib_asset)
+                self.assertEqual(len(grib_asset["raster:bands"]), 1)
+                grib_band = grib_asset["raster:bands"][0]
+                self.assertEqual(grib_band["spatial_resolution"], 1000)
+                self.assertEqual(grib_band["unit"], "mm")
+                self.assertEqual(grib_band["data_type"], "float64")
+                # self.assertTrue("classification:classes" in grib_band)
+                # self.assertEqual(len(grib_band["classification:classes"]), 1)
+                # self.assertEqual(grib_band["nodata"], -999)
 
                 item.validate()
