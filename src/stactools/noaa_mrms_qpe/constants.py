@@ -88,8 +88,8 @@ PROJJSON: Dict[str, Any] = {
 }
 
 UNIT = "mm"
-# The files report a slightly smaller resolution, but 1000m / 1km is defined in the official documentation
-# so I'm following the official docs for now
+# The files report a slightly smaller resolution, but 1000m / 1km is defined
+# in the official documentation so I'm following the official docs for now
 RESOLUTION_M = 1000
 
 ASSET_GRIB2_KEY = "grib2"
@@ -102,9 +102,9 @@ GRIB2_CLASSIFICATION = [
         "value": -1,
         "name": "missing-value",
         "description": "Missing value (no-data)",
-        # the nodata flag is not supported yet in classification ext v1.1, 
+        # the nodata flag is not supported yet in classification ext v1.1,
         # but is also doesn't hurt to add it already.
-        # the same applies for all other occurances below
+        # the same applies for all other occurrences below
         # https://github.com/stac-extensions/classification/pull/32
         "nodata": True,
     },
