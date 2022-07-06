@@ -2,7 +2,7 @@
   "type": "Collection",
   "id": "noaa-mrms-qpe-1h-pass1",
   "stac_version": "1.0.0",
-  "description": "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation (QPE) product is generated fully automatically from multiple sources to generate seamless, hourly 1 km mosaics over the US.\n\n**Note:** The data for Guam and the Caribbean Islands are [no Multi-Sensor QPE products](https://vlab.noaa.gov/documents/96675/666999/MS_DomainDiffernces.png) yet.\n\nThis is the 1-hour pass 1 product with less latency (60 min), but less gauges (60-65 %).",
+  "description": "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation (QPE) product is generated fully automatically from multiple sources to generate seamless, hourly 1 km mosaics over the US.\n\n**Note:** The data for Guam and the Caribbean Islands are [not multi-sensor products](https://vlab.noaa.gov/documents/96675/666999/MS_DomainDiffernces.png) yet.\n\nThis is the 1-hour pass 1 product with less latency (60 min), but less gauges (60-65 %).",
   "links": [
     {
       "rel": "root",

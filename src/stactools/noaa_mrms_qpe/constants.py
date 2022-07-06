@@ -1,7 +1,17 @@
+import enum
 import re
 from typing import Any, Dict
 
 from pystac import Link, Provider, ProviderRole, RelType
+
+
+class AOI(str, enum.Enum):
+    CONUS = "CONUS"
+    HAWAII = "HAWAII"
+    GUAM = "GUAM"
+    ALASKA = "ALASKA"
+    CARIB = "CARIB"
+
 
 EXTENSION = (
     "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"

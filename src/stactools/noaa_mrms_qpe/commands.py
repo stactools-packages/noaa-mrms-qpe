@@ -5,7 +5,7 @@ import click
 from click import Command, Group
 from pystac import Collection
 
-from stactools.noaa_mrms_qpe import stac
+from stactools.noaa_mrms_qpe import constants, stac
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     """Creates the stactools-noaa-mrms-qpe command line utility."""
 
     @cli.group(
-        "noaa_mrms_qpe",
+        "noaa-mrms-qpe",
         short_help=("Commands for working with stactools-noaa-mrms-qpe"),
     )
     def noaa_mrms_qpe() -> None:
@@ -91,8 +91,8 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     @click.argument("destination")
     @click.option(
         "--aoi",
-        default="CONUS",
-        help="The area of interest, either 'ALASKA', 'CONUS' (continental US, default), "
+        type=click.Choice(constants.AOI),  # type: ignore
+        help="The area of interest, either 'ALASKA', 'CONUS' (continental US), "
         "'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'",
     )
     @click.option(
@@ -120,7 +120,7 @@ def create_noaa_mrms_qpe_command(cli: Group) -> Command:
     def create_item_command(
         source: str,
         destination: str,
-        aoi: str = "CONUS",
+        aoi: constants.AOI,
         collection: str = "",
         nocog: bool = False,
         nogrib: bool = False,

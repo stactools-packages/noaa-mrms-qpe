@@ -79,7 +79,7 @@ def create_collection(
         "The Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation "
         "(QPE) product is generated fully automatically from multiple sources to generate "
         "seamless, hourly 1 km mosaics over the US.\n\n"
-        "**Note:** The data for Guam and the Caribbean Islands are [no Multi-Sensor QPE products]"
+        "**Note:** The data for Guam and the Caribbean Islands are [not multi-sensor products]"
         "(https://vlab.noaa.gov/documents/96675/666999/MS_DomainDiffernces.png) yet."
     )
     if pass_no == 1:
@@ -168,7 +168,7 @@ def create_collection(
 
 def create_item(
     asset_href: str,
-    aoi: str = "CONUS",
+    aoi: constants.AOI,
     collection: Optional[Collection] = None,
     nocog: bool = False,
     nogrib: bool = False,
@@ -183,7 +183,7 @@ def create_item(
 
     Args:
         asset_href (str): The HREF pointing to an asset associated with the item
-        aoi (str): The area of interest, either 'ALASKA', 'CONUS' (continental US, default),
+        aoi (AOI): The area of interest, either 'ALASKA', 'CONUS' (continental US),
             'CARIB' (Caribbean islands), 'GUAM' or 'HAWAII'
         collection (pystac.Collection): HREF to an existing collection
         nocog (bool): If set to True, no COG file is generated for the Item
@@ -227,7 +227,8 @@ def create_item(
 
     # Projection extension for assets
     proj_attrs = ProjectionExtension.ext(item, add_if_missing=True)
-    # Set CRS details globally if they are the same for COG and GRIB or only one of them is exposed
+    # Set CRS details globally if they are the same for COG and GRIB or only one of them is exposed.
+    # Otherwise, we set the CRS information in the asset
     if epsg == 0 or nocog or nogrib:
         proj_attrs.epsg = None
         proj_attrs.projjson = constants.PROJJSON

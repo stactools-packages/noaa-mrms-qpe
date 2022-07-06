@@ -24,7 +24,7 @@ class CommandsTest(CliTestCase):
             pass_no = 1
 
             result = self.run_command(
-                f"noaa_mrms_qpe create-collection {destination} "
+                f"noaa-mrms-qpe create-collection {destination} "
                 f"--period {period} --pass_no {pass_no} --start_time 2022-01-01T00:00:00Z"
             )
 
@@ -66,7 +66,7 @@ class CommandsTest(CliTestCase):
             dest_stac = os.path.join(tmp_dir, stac_filename)
 
             result = self.run_command(
-                f"noaa_mrms_qpe create-item {dest_data_file} {dest_stac} --aoi {aoi}"
+                f"noaa-mrms-qpe create-item {dest_data_file} {dest_stac} --aoi {aoi}"
             )
             self.assertEqual(result.exit_code, 0, msg="\n{}".format(result.output))
 

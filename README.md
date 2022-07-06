@@ -38,13 +38,13 @@ pip install stactools-noaa-mrms-qpe
 Create a collection, e.g. 24-hour Pass 2:
 
 ```shell
-stac noaa_mrms_qpe create-collection collection.json --period 24 --pass_no 2
+stac noaa-mrms-qpe create-collection collection.json --period 24 --pass_no 2
 ```
 
 Get information about all options for collection creation:
 
 ```shell
-stac noaa_mrms_qpe create-collection --help
+stac noaa-mrms-qpe create-collection --help
 ```
 
 ### Item
@@ -52,19 +52,19 @@ stac noaa_mrms_qpe create-collection --help
 Create an item for continentel US with a GRIB2 and COG asset:
 
 ```shell
-stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item_grib.json --collection collection.json
+stac noaa-mrms-qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item_grib.json --collection collection.json
 ```
 
 Create an item for ALASKA with only a COG asset converted to EPSG:3857:
 
 ```shell
-stac noaa_mrms_qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item.json --aoi ALASKA --collection collection.json --nogrib TRUE --epsg 3857
+stac noaa-mrms-qpe create-item MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220530-120000.grib2.gz item.json --aoi ALASKA --collection collection.json --nogrib TRUE --epsg 3857
 ```
 
 Get information about all options for item creation:
 
 ```shell
-stac noaa_mrms_qpe create-item --help
+stac noaa-mrms-qpe create-item --help
 ```
 
 Use `stac noaa-mrms-qpe --help` to see all subcommands and options.
