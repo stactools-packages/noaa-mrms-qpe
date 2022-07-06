@@ -1,0 +1,167 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "GUAM_MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000",
+  "properties": {
+    "noaa_mrms_qpe:pass": 1,
+    "noaa_mrms_qpe:period": 1,
+    "description": "Multi-sensor accumulation 1-hour (1-hour latency) [mm]",
+    "proj:epsg": null,
+    "proj:projjson": {
+      "$schema": "https://proj.org/schemas/v0.4/projjson.schema.json",
+      "type": "GeographicCRS",
+      "name": "unknown",
+      "datum": {
+        "type": "GeodeticReferenceFrame",
+        "name": "unknown",
+        "ellipsoid": {
+          "name": "unknown",
+          "semi_major_axis": 6378160,
+          "inverse_flattening": 298.253916296469
+        }
+      },
+      "coordinate_system": {
+        "subtype": "ellipsoidal",
+        "axis": [
+          {
+            "name": "Longitude",
+            "abbreviation": "lon",
+            "direction": "east",
+            "unit": "degree"
+          },
+          {
+            "name": "Latitude",
+            "abbreviation": "lat",
+            "direction": "north",
+            "unit": "degree"
+          }
+        ]
+      }
+    },
+    "datetime": "2022-06-01T12:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          140.0,
+          18.0
+        ],
+        [
+          150.0,
+          18.0
+        ],
+        [
+          150.0,
+          9.0
+        ],
+        [
+          140.0,
+          9.0
+        ],
+        [
+          140.0,
+          18.0
+        ]
+      ]
+    ]
+  },
+  "links": [],
+  "assets": {
+    "cog": {
+      "href": "tests/data-files/GUAM/MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Processed Cloud-optimized GeoTiff file",
+      "proj:shape": [
+        2000,
+        1800
+      ],
+      "proj:transform": [
+        0.0049999994997498645,
+        0.0,
+        140.00050400025012,
+        0.0,
+        -0.004999999999999998,
+        18.0005
+      ],
+      "raster:bands": [
+        {
+          "spatial_resolution": 1000,
+          "unit": "mm",
+          "data_type": "float64",
+          "statistics": {
+            "minimum": 0.0,
+            "maximum": 9.100000381469727
+          },
+          "classification:classes": [
+            {
+              "value": -1,
+              "name": "no-data",
+              "description": "No coverage or missing value (no-data)",
+              "nodata": true
+            }
+          ],
+          "nodata": -1
+        }
+      ],
+      "roles": [
+        "data",
+        "cloud-optimized"
+      ]
+    },
+    "grib2": {
+      "href": "tests/data-files/GUAM/MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000.grib2",
+      "type": "application/wmo-GRIB2",
+      "title": "Original GRIB2 file",
+      "proj:shape": [
+        2000,
+        1800
+      ],
+      "proj:transform": [
+        0.0049999994997498645,
+        0.0,
+        140.00050400025012,
+        0.0,
+        -0.004999999999999998,
+        18.0005
+      ],
+      "raster:bands": [
+        {
+          "spatial_resolution": 1000,
+          "unit": "mm",
+          "data_type": "float64",
+          "statistics": {
+            "minimum": 0.0,
+            "maximum": 9.100000381469727
+          },
+          "classification:classes": [
+            {
+              "value": -3,
+              "name": "no-coverage",
+              "description": "No coverage (no-data)",
+              "nodata": true
+            }
+          ],
+          "nodata": -3
+        }
+      ],
+      "roles": [
+        "data",
+        "source"
+      ]
+    }
+  },
+  "bbox": [
+    140.0,
+    9.0,
+    150.0,
+    18.0
+  ],
+  "stac_extensions": [
+    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+  ]
+}

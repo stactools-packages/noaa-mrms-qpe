@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import rasterio
+from dateutil.parser import isoparse
 from pystac import (
     Asset,
     CatalogType,
@@ -52,7 +53,7 @@ def create_collection(
     if start_time is None:
         start_datetime = datetime.now(tz=timezone.utc)
     else:
-        start_datetime = datetime.fromisoformat(start_time)
+        start_datetime = isoparse(start_time)
 
     spatial_extents = list(constants.EXTENTS.values())
     extent = Extent(
