@@ -258,8 +258,8 @@ def create_item(
             valid_data = np.ma.masked_array(data, mask=(data < 0))  # type: ignore
 
             band["statistics"] = {
-                "minimum": np.nanmin(valid_data),
-                "maximum": np.nanmax(valid_data),
+                "minimum": float(np.nanmin(valid_data)),
+                "maximum": float(np.nanmax(valid_data)),
             }
 
             classes = []
