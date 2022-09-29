@@ -1,7 +1,0 @@
-DOCKER_REGISTRY=ghcr.io
-DOCKER_ORG=stactools-packages
-DOCKER_REPO=noaa-mrms-qpe
-DOCKER_TAG=local
-DOCKER_TAG_DEV=local-dev
-DOCKER_WORKDIR=/opt/stactools-noaa-mrms-qpe
-DOCKER_NAMESPACE_PACKAGE_DIR=stactools/noaa_mrms_qpe
