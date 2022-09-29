@@ -20,6 +20,7 @@ This document explains the NOAA MRMS QPE Extension to the [SpatioTemporal Asset 
 | -------------------- | ------- | ----------- |
 | noaa_mrms_qpe:pass   | integer | **REQUIRED**. The pass number: `1` = less latency, but less gauges; `2` = more latency, but more gauges. |
 | noaa_mrms_qpe:period | integer | **REQUIRED**. The number of hours of the accumulations. One of: `1`, `3`, `6`, `12`, `24`, `48`, `72` |
+| noaa_mrms_qpe:region | string  | **REQUIRED**. The region of the data. One of: `CONUS` (Continental US), `HAWAII`, `GUAM`, `ALASKA`, `CARIB` (Caribbean Islands) |
 
 ## Contributing
 

@@ -96,6 +96,7 @@ def create_collection(
     summaries = Summaries({})
     summaries.add(constants.EXT_PASS, [pass_no])
     summaries.add(constants.EXT_PERIOD, [period])
+    summaries.add(constants.EXT_REGION, [e.value for e in constants.AOI])
 
     collection = Collection(
         stac_extensions=[constants.EXTENSION],
@@ -207,6 +208,7 @@ def create_item(
     properties = {
         constants.EXT_PASS: basics.pass_no,
         constants.EXT_PERIOD: basics.period,
+        constants.EXT_REGION: aoi.value,
         "description": description,
     }
 

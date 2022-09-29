@@ -27,7 +27,8 @@
                   "$comment": "Require fields here for Item Properties.",
                   "required": [
                     "noaa_mrms_qpe:pass",
-                    "noaa_mrms_qpe:period"
+                    "noaa_mrms_qpe:period",
+                    "noaa_mrms_qpe:region"
                   ]
                 },
                 {
@@ -148,7 +149,8 @@
       "$comment": "Please list all fields here so that we can force the existance of one of them in other parts of the schemas.",
       "anyOf": [
         {"required": ["noaa_mrms_qpe:pass"]},
-        {"required": ["noaa_mrms_qpe:period"]}
+        {"required": ["noaa_mrms_qpe:period"]},
+        {"required": ["noaa_mrms_qpe:region"]}
       ]
     },
     "fields": {
@@ -172,6 +174,16 @@
             24,
             48,
             72
+          ]
+        },
+        "noaa_mrms_qpe:region": {
+          "type": "string",
+          "enum": [
+            "CONUS",
+            "HAWAII",
+            "GUAM",
+            "ALASKA",
+            "CARIB"
           ]
         }
       },

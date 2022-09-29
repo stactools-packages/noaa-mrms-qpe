@@ -5,6 +5,7 @@
   "properties": {
     "noaa_mrms_qpe:pass": 2,
     "noaa_mrms_qpe:period": 24,
+    "noaa_mrms_qpe:region": "GUAM",
     "description": "Multi-sensor accumulation 24-hour (2-hour latency) [mm]",
     "datetime": "2022-07-04T14:00:00Z"
   },

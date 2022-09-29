@@ -24,6 +24,7 @@ CLASSIFICATION_EXTENSION_V11 = (
 
 EXT_PASS = "noaa_mrms_qpe:pass"
 EXT_PERIOD = "noaa_mrms_qpe:period"
+EXT_REGION = "noaa_mrms_qpe:region"
 
 EXTENTS = {
     "UNION": [-176.0, 9.0, 150.0, 72.0],  # Union of all extents

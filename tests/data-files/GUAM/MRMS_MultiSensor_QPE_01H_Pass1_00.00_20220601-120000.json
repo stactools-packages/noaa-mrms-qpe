@@ -5,6 +5,7 @@
   "properties": {
     "noaa_mrms_qpe:pass": 1,
     "noaa_mrms_qpe:period": 1,
+    "noaa_mrms_qpe:region": "GUAM",
     "description": "Multi-sensor accumulation 1-hour (1-hour latency) [mm]",
     "proj:epsg": null,
     "proj:projjson": {

@@ -214,6 +214,9 @@ class StacTest(unittest.TestCase):
                 self.assertEqual(item.id, f"{folder}_{id}")
                 self.assertEqual(item.properties["noaa_mrms_qpe:pass"], pass_no)
                 self.assertEqual(item.properties["noaa_mrms_qpe:period"], period)
+                self.assertEqual(
+                    item.properties["noaa_mrms_qpe:region"], constants.AOI[folder]
+                )
                 self.assertTrue("description" in item.properties)
                 ref_dt = datetime(
                     dt[0], dt[1], dt[2], dt[3], 0, 0, 0, tzinfo=timezone.utc
