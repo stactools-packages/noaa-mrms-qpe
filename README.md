@@ -9,15 +9,16 @@
 - Dataset homepage: <https://mrms.nssl.noaa.gov>
 - STAC extensions used:
   - [classification](https://github.com/stac-extensions/classification/)
+  - [NOAA MRMS QPE](https://github.com/stac-extensions/noaa-mrms-qpe)
   - [raster](https://github.com/stac-extensions/raster/)
   - [proj](https://github.com/stac-extensions/projection/)
 - Extra fields:
-  - See [NOAA MRMS QPE extension](./extension/README.md) for details
+  - See the [NOAA MRMS QPE extension](https://github.com/stac-extensions/noaa-mrms-qpe) for details
 
 A stactools package for NOAA's Multi-Radar Multi-Sensor (MRMS) Quantitative Precipitation Estimation (QPE) dataset.
 
 This package can generate STAC files from (gzipped) GRIB2 files that link to the original GRIB2 files and/or
-to cloud-optimized GeoTiffs (COGs) in the original or any other EPSG projection.
+to Cloud-Optimized GeoTiffs (COGs) in the original or any other EPSG projection.
 
 ## STAC Examples
 

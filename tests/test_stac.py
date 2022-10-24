@@ -205,10 +205,7 @@ class StacTest(unittest.TestCase):
                         epsg=epsg,
                     )
 
-                # Item validation fails for some items due to a bug in the schema of the
-                # projection extension, see https://github.com/stac-extensions/projection/issues/7
-                # So the following line should be enabled again once the issue has been solved:
-                # item.validate()
+                item.validate()
 
                 self.assertIsNotNone(item)
                 self.assertEqual(item.id, f"{folder}_{id}")
@@ -223,10 +220,9 @@ class StacTest(unittest.TestCase):
                 )
                 self.assertEqual(item.datetime, ref_dt)
 
-                self.assertEqual("proj:epsg" in item.properties, proj_toplevel)
                 self.assertEqual("proj:projjson" in item.properties, proj_toplevel)
+                self.assertIsNone(item.properties["proj:epsg"])
                 if proj_toplevel:
-                    self.assertIsNone(item.properties["proj:epsg"])
                     self.assertIsInstance(item.properties["proj:projjson"], dict)
 
                 if collection is not None:

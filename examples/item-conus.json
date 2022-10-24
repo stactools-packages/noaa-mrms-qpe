@@ -3,6 +3,7 @@
   "stac_version": "1.0.0",
   "id": "CONUS_MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220702-110000",
   "properties": {
+    "proj:epsg": null,
     "noaa_mrms_qpe:pass": 2,
     "noaa_mrms_qpe:period": 24,
     "noaa_mrms_qpe:region": "CONUS",
@@ -48,7 +49,7 @@
     "cog": {
       "href": "MRMS_MultiSensor_QPE_24H_Pass2_00.00_20220702-110000.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "title": "Processed Cloud-optimized GeoTiff file",
+      "title": "Processed Cloud-Optimized GeoTiff file",
       "proj:shape": [
         6553,
         4279
@@ -150,7 +151,7 @@
     55.0
   ],
   "stac_extensions": [
-    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
+    "https://stac-extensions.github.io/noaa-mrms-qpe/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
     "https://stac-extensions.github.io/classification/v1.1.0/schema.json",
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json"

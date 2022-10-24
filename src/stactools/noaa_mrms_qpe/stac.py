@@ -234,6 +234,11 @@ def create_item(
     if epsg == 0 or nocog or nogrib:
         proj_attrs.epsg = None
         proj_attrs.projjson = constants.PROJJSON
+    else:
+        # Item validation fails if proj:epsg is not in the items due to a bug in the schema of the
+        # projection extension, see https://github.com/stac-extensions/projection/issues/7
+        # So the following line should be removed once the issue has been solved.
+        proj_attrs.epsg = None
 
     def create_asset(
         href: str,

@@ -73,7 +73,7 @@
     "cog": {
       "href": "tests/data-files/GUAM/MRMS_MultiSensor_QPE_01H_Pass1_00.00_20220601-120000.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "title": "Processed Cloud-optimized GeoTiff file",
+      "title": "Processed Cloud-Optimized GeoTiff file",
       "proj:shape": [
         2000,
         1800
@@ -160,7 +160,7 @@
     18.0
   ],
   "stac_extensions": [
-    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe/main/extension/schema.json",
+    "https://stac-extensions.github.io/noaa-mrms-qpe/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
     "https://stac-extensions.github.io/classification/v1.1.0/schema.json",
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json"

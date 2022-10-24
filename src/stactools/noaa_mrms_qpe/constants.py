@@ -13,10 +13,7 @@ class AOI(str, enum.Enum):
     CARIB = "CARIB"
 
 
-EXTENSION = (
-    "https://raw.githubusercontent.com/stactools-packages/noaa-mrms-qpe"
-    "/main/extension/schema.json"
-)
+EXTENSION = "https://stac-extensions.github.io/noaa-mrms-qpe/v1.0.0/schema.json"
 RASTER_EXTENSION_V11 = "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
 CLASSIFICATION_EXTENSION_V11 = (
     "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
@@ -134,7 +131,7 @@ GRIB2_CLASSIFICATION = [
 ]
 
 ASSET_COG_KEY = "cog"
-ASSET_COG_TITLE = "Processed Cloud-optimized GeoTiff file"
+ASSET_COG_TITLE = "Processed Cloud-Optimized GeoTiff file"
 COG_COMPRESS = "LZW"
 COG_NODATA = -1
 COG_ROLES = ["data", "cloud-optimized"]

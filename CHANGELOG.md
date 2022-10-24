@@ -10,17 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - New property `noaa_mrms_qpe:region`
 
-### Deprecated
+### Changed
 
-- Nothing.
-
-### Removed
-
-- Nothing.
+- Moved extension to separate repository: <https://github.com/stac-extensions/noaa-mrms-qpe>
+- Always add `proj:epsg` to Item to fulfill a proj extension "requirement" (schema issue in 1.0.0).
 
 ### Fixed
 
-- Nothing.
+- Changed casing of Cloud-Optimized in the asset titles
 
 ## [0.2.0]
 
