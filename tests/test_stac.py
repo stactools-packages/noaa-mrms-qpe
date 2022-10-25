@@ -317,3 +317,29 @@ class StacTest(unittest.TestCase):
 
                         if len(grib_band["classification:classes"]) == 1:
                             self.assertTrue("nodata" in grib_band)
+
+    def test_datetime(self) -> None:
+        src_dir = "./tests/data-files/ALASKA"
+        filename = "MRMS_MultiSensor_QPE_01H_Pass1_00.00_20221024-015800.grib2.gz"
+
+        with TemporaryDirectory() as tmp_dir:
+            src_data_file = os.path.join(src_dir, filename)
+            dest_data_file = os.path.join(tmp_dir, filename)
+            shutil.copyfile(src_data_file, dest_data_file)
+
+            item = stac.create_item(
+                dest_data_file,
+                aoi=constants.AOI["ALASKA"],
+                nogrib=True,
+                nocog=True,
+            )
+
+        item.validate()
+        if item.datetime is not None:
+            item_datetime = item.datetime
+        self.assertEqual(item_datetime.year, 2022)
+        self.assertEqual(item_datetime.month, 10)
+        self.assertEqual(item_datetime.day, 24)
+        self.assertEqual(item_datetime.hour, 1)
+        self.assertEqual(item_datetime.minute, 58)
+        self.assertEqual(item_datetime.second, 0)
