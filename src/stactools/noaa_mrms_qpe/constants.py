@@ -60,7 +60,7 @@ LINK_MRMS_TECH_GUIDE = Link(
 )
 
 FILENAME_PATTERN = re.compile(
-    r"^(MRMS_MultiSensor_QPE_(\d{2})H_Pass(\d)_\d+\.\d+_(\d{4})(\d{2})(\d{2})-(\d{2})0000)\.grib2(\.gz)?$"  # noqa: E501
+    r"^(MRMS_MultiSensor_QPE_(\d{2})H_Pass(\d)_\d+\.\d+_(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2}))\.grib2(\.gz)?$"  # noqa: E501
 )
 
 PROJJSON: Dict[str, Any] = {

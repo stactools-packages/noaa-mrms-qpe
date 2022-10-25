@@ -347,20 +347,22 @@ def parse_filename(path: str) -> FileInfo:
     filename = os.path.basename(path)
     parts = constants.FILENAME_PATTERN.match(filename)
     if parts is None:
-        raise ValueError("Filename is not valid")
+        raise ValueError(f"Filename is not valid: {filename}")
 
     year = int(parts.group(4))
     month = int(parts.group(5))
     day = int(parts.group(6))
     hour = int(parts.group(7))
-    time = datetime(year, month, day, hour, tzinfo=timezone.utc)
+    minute = int(parts.group(8))
+    second = int(parts.group(9))
+    time = datetime(year, month, day, hour, minute, second, tzinfo=timezone.utc)
 
     return FileInfo(
         id=parts.group(1),
         period=int(parts.group(2)),
         pass_no=int(parts.group(3)),
         datetime=time,
-        gzip=False if parts.group(8) is None else True,
+        gzip=False if parts.group(10) is None else True,
     )
 
 
