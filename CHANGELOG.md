@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.3.1]
+
 ### Fixed
 
 - Capture the minutes and seconds from the file names as they are not always 0
@@ -51,6 +53,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - First release
 
 [Unreleased]: <https://github.com/stactools-packages/noaa-mrms-qpe/tree/main/>
+[0.3.1]: <https://github.com/stactools-packages/noaa-mrms-qpe/tree/v0.3.1/>
 [0.3.0]: <https://github.com/stactools-packages/noaa-mrms-qpe/tree/v0.3.0/>
 [0.2.0]: <https://github.com/stactools-packages/noaa-mrms-qpe/tree/v0.2.0/>
 [0.1.1]: <https://github.com/stactools-packages/noaa-mrms-qpe/tree/v0.1.1/>
