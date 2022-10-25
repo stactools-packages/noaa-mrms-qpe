@@ -347,7 +347,7 @@ def parse_filename(path: str) -> FileInfo:
     filename = os.path.basename(path)
     parts = constants.FILENAME_PATTERN.match(filename)
     if parts is None:
-        raise ValueError("Filename is not valid")
+        raise ValueError(f"Filename is not valid: {filename}")
 
     year = int(parts.group(4))
     month = int(parts.group(5))
